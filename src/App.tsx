@@ -1,90 +1,292 @@
-import React from "react";
+import React, { useState } from "react";
+import { Pane, Heading, Checkbox, Text, Switch } from "evergreen-ui";
+import styled, { ThemeProvider } from "styled-components";
 import "./App.css";
-import { Helmet } from "react-helmet";
-import Board from "./Board";
+import { lightTheme, darkTheme } from "./theme";
+import { GlobalStyle } from "./global-styles";
 import WallLeftIndicator from "./Player/WallLeftIndicator";
+import Board from "./Board";
+import { AppConfig, Color, History } from "./Utils";
+import { v4 as uuid } from "uuid";
 
-interface Props {
-  height: number;
-  width: number;
-  numOfPlayers: number;
-  numOfBricks: number;
-  stepSize: number;
-  lengthOfBricks: number;
-}
+const Layout = styled(Pane)`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+`;
 
-const mainContent = ({ height, width, numOfPlayers, numOfBricks }: Props) => {
-  const option = {
-    numOfWallLeft: 10,
-    playerNumber: 1,
-  };
-  const option2 = {
-    numOfWallLeft: 10,
-    playerNumber: 2,
-  };
-  return (
-    <div>
-      <div className="game-info">{WallLeftIndicator(option)}</div>
-      <div> {Board({ height, width })}</div>
-      <div className="game-info">{WallLeftIndicator(option2)}</div>
-    </div>
-  );
+const SectionTab = styled(Pane)`
+  flex: 1;
+  width: 20%;
+  flex-shrink: 0;
+  padding: 24px;
+`;
+
+const Section = styled(Pane)`
+  flex: 1;
+  width: 100%;
+  flex-shrink: 0;
+  padding: 24px;
+`;
+
+const Header = styled(Pane)`
+  display: flex;
+  padding: 10px 24px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+`;
+
+const gameId = uuid();
+
+// export const history: History = [];
+const appConfig: AppConfig = {
+  boardHeight: 17,
+  boardWidth: 17,
+  // boardColor: {
+  //   wallColor: {
+  //     defaultColor: Color.N3,
+  //     hover: Color.N5,
+  //     click: Color.N10,
+  //   },
+  //   cellColor: {
+  //     defaultColor: Color.white,
+  //     player1Color: {
+  //       hover: Color.N5,
+  //       click: Color.N10,
+  //     },
+  //     player0Color: {
+  //       hover: Color.B6,
+  //       click: Color.B9,
+  //     },
+  //   },
+  // },
+  boardColor: {
+    wallColor: {
+      defaultColor: Color.NotionWhite,
+      hover: Color.N5,
+      click: Color.NotionDark,
+    },
+    cellColor: {
+      defaultColor: Color.white,
+      player1Color: {
+        hover: Color.RedLight,
+        click: Color.RedBase,
+      },
+      player0Color: {
+        hover: Color.YellowLight,
+        click: Color.YellowBase,
+      },
+    },
+  },
+  wallLonger: 60,
+  breadth: 12,
+  numberOfPlayers: 2,
+  numberOfWalls: 10,
+  lengthOfWalls: 2,
+};
+const initialStep = {
+  player0: {
+    x: (appConfig.boardWidth - 1) / 2,
+    y: 0,
+    remainingWalls: appConfig.numberOfWalls,
+  },
+  player1: {
+    x: (appConfig.boardWidth - 1) / 2,
+    y: appConfig.boardHeight - 1,
+    remainingWalls: appConfig.numberOfWalls,
+  },
+  walls: [],
+  stepNumber: 0,
 };
 
 function App() {
-  const defaultOption: Props = {
-    height: 9,
-    width: 9,
-    numOfPlayers: 2,
-    stepSize: 1,
-    numOfBricks: 10,
-    lengthOfBricks: 2,
+  const [isSideTabShown, setSideTabShown] = useState<boolean>(true);
+  const [history, setHistory] = useState<History>([initialStep]);
+
+  const move = (position: { x: number; y: number }) => {
+    const currentStep = history[history.length - 1];
+    const { stepNumber } = currentStep;
+
+    if (stepNumber % 2 !== 0) {
+      if (
+        Math.abs(currentStep.player1.x - position.x) +
+          Math.abs(currentStep.player1.y - position.y) ===
+          2 &&
+        Math.abs(currentStep.player0.x - position.x) +
+          Math.abs(currentStep.player0.y - position.y) !==
+          0
+      ) {
+        currentStep.player1.x = position.x;
+        currentStep.player1.y = position.y;
+        currentStep.stepNumber += 1;
+        const temp = [...history, currentStep];
+        setHistory(temp);
+      }
+    } else {
+      if (
+        Math.abs(currentStep.player0.x - position.x) +
+          Math.abs(currentStep.player0.y - position.y) ===
+          2 &&
+        Math.abs(currentStep.player1.x - position.x) +
+          Math.abs(currentStep.player1.y - position.y) !==
+          0
+      ) {
+        currentStep.player0.x = position.x;
+        currentStep.player0.y = position.y;
+        currentStep.stepNumber += 1;
+        const temp = [...history, currentStep];
+        setHistory(temp);
+      }
+    }
+  };
+
+  const put = (position: { x: number; y: number }) => {
+    const currentStep = history[history.length - 1];
+    const { stepNumber } = currentStep;
+
+    if (stepNumber % 2 !== 0) {
+      currentStep.player1.remainingWalls -= 1;
+    } else {
+      currentStep.player0.remainingWalls -= 1;
+    }
+
+    const { x, y } = position;
+    if (x % 2 !== 0 && y % 2 === 0) {
+      currentStep.walls.push(position);
+      currentStep.walls.push({ x: x, y: y + 1 });
+      currentStep.walls.push({ x: x, y: y + 2 });
+      currentStep.stepNumber += 1;
+      const temp = [...history, currentStep];
+      setHistory(temp);
+    } else if (x % 2 === 0 && y % 2 !== 0) {
+      currentStep.walls.push(position);
+      currentStep.walls.push({ x: x + 1, y: y });
+      currentStep.walls.push({ x: x + 2, y: y });
+      currentStep.stepNumber += 1;
+      const temp = [...history, currentStep];
+      setHistory(temp);
+    }
+  };
+
+  const [isHover, setHover] = useState<boolean[][]>(
+    new Array(appConfig.boardHeight).fill(false).map((_) => {
+      return new Array(appConfig.boardWidth).fill(false);
+    })
+  );
+
+  const handleHoverOn = (position: { x: number; y: number }) => {
+    const temp = new Array(appConfig.boardHeight).fill(false).map((_) => {
+      return new Array(appConfig.boardWidth).fill(false);
+    });
+    const currentStep = history[history.length - 1];
+    const { stepNumber } = currentStep;
+
+    const { x, y } = position;
+    console.log(x, y);
+    if (x % 2 === 0 && y % 2 === 0) {
+      //Cell
+      temp[x][y] = true;
+    } else if (x % 2 !== 0 && y % 2 === 0) {
+      //wallHorizontal
+      if (y === 16) {
+        temp[x][y] = true;
+        temp[x][y - 1] = true;
+        temp[x][y - 2] = true;
+      } else {
+        temp[x][y] = true;
+        temp[x][y + 1] = true;
+        temp[x][y + 2] = true;
+      }
+    } else if (x % 2 === 0 && y % 2 !== 0) {
+      //wallVertical
+      if (x === 16) {
+        temp[x][y] = true;
+        temp[x - 1][y] = true;
+        temp[x - 2][y] = true;
+      } else {
+        temp[x][y] = true;
+        temp[x + 1][y] = true;
+        temp[x + 2][y] = true;
+      }
+    }
+    // else: wallIntersect
+    setHover(temp);
+  };
+
+  const handleHoverOff = (position: { x: number; y: number }) => {
+    const temp = new Array(appConfig.boardHeight).fill(false).map((_) => {
+      return new Array(appConfig.boardWidth).fill(false);
+    });
+    setHover(temp);
+  };
+
+  const [isChecked, setChecked] = useState<boolean>(false);
+
+  const [theme, setTheme] = useState("light");
+
+  const isLight = theme === "light";
+
+  const toggleTheme = () => {
+    if (theme === "light") {
+      setTheme("dark");
+    } else {
+      setTheme("light");
+    }
   };
 
   return (
-    <div>
-      <table>
-        <tbody>
-          <tr>
-            <td>1</td>
-            <table>
-              <tbody>
-                <tr>
-                  <td>2</td>
-                </tr>
-              </tbody>
-            </table>
-            <td>2</td>
-          </tr>
-          <tr>
-            <td>2</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    // <div>
-    //   <Helmet>
-    //     <title>Quoridor</title>
-    //     <meta name="viewport" content="width=600" />
-    //   </Helmet>
-    //   <div className="game">{mainContent(defaultOption)}</div>
-    // </div>
-    // <div className="App">
-    //   <header className="App-header">
-    //     <img src={logo} className="App-logo" alt="logo" />
-    //     <p>
-    //       Edit <code>src/App.tsx</code> and save to reload.
-    //     </p>
-    //     <a
-    //       className="App-link"
-    //       href="https://reactjs.org"
-    //       target="_blank"
-    //       rel="noopener noreferrer"
-    //     >
-    //       Learn React
-    //     </a>
-    //   </header>
-    // </div>
+    <ThemeProvider theme={theme === "light" ? lightTheme : darkTheme}>
+      <GlobalStyle />
+      <Layout alignItems="center" justifyContent="center">
+        {/* <Header background="blueTint" alignItems="center" borderBottom>
+          <Heading color="default" size={600}>
+            Quoridor React
+          </Heading>
+          <Checkbox
+            marginLeft="auto"
+            size={60}
+            checked={isSideTabShown}
+            onChange={() => setSideTabShown((isShown) => !isShown)}
+            label="Show Side Tab"
+          />
+        </Header> */}
+        <WallLeftIndicator appConfig={appConfig} history={history} id={0} />
+        <Board
+          appConfig={appConfig}
+          history={history}
+          move={move}
+          put={put}
+          isHover={isHover}
+          handleHoverOn={handleHoverOn}
+          handleHoverOff={handleHoverOff}
+        />
+        <WallLeftIndicator appConfig={appConfig} history={history} id={1} />
+        <button
+          onClick={() => {
+            toggleTheme();
+          }}
+        >
+          Dark Mode
+        </button>
+        {/* {isSideTabShown && (
+          <SectionTab borderLeft>
+            <Switch
+              checked={isChecked}
+              onClick={() => {
+                setChecked(!isChecked);
+                toggleTheme();
+              }}
+            >
+              Dark Mode
+            </Switch>
+            <Text> Dark Mode </Text>
+          </SectionTab>
+        )} */}
+      </Layout>
+    </ThemeProvider>
   );
 }
 

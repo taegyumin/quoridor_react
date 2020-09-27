@@ -22,6 +22,14 @@ html {
   height: 100%;
 }
 
+#square {
+  width: 100px;
+  height: 100px;
+  background: red;
+  display: inline;
+  white-space: no-wrap;
+}
+
 /* https://htmlcolorcodes.com/  */
 
 :root {
@@ -65,7 +73,7 @@ body {
 
 .game {
   color: white;
-  padding: 10px;
+  /* padding: 10px; */
   background: black;
   border-radius: 10px;
   animation: bounceIn 0.5s;
@@ -78,7 +86,7 @@ body {
 .game-info {
   display: flex;
   align-items: center;
-  padding: 10px;
+  /* padding: 10px; */
 }
 
 .game-board {

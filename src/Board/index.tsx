@@ -3,41 +3,104 @@ import Cell from "./Cell";
 import WallHorizontal from "./Wall/WallHorizontal";
 import WallVertical from "./Wall/WallVertical";
 import WallIntersect from "./Wall/WallIntersect";
+import { Pane } from "evergreen-ui";
+import { History, AppConfig } from "../Utils";
 
 interface Props {
-  height: number;
-  width: number;
+  appConfig: AppConfig;
+  history: History;
+  move: (position: { x: number; y: number }) => void;
+  put: (position: { x: number; y: number }) => void;
+  isHover: boolean[][];
+  handleHoverOn: (position: { x: number; y: number }) => void;
+  handleHoverOff: (position: { x: number; y: number }) => void;
 }
 
-const Board = ({ height, width }: Props) => {
-  const createTable = ({ height, width }: Props) => {
-    let table = [];
+const Board = ({
+  appConfig,
+  history,
+  move,
+  put,
+  isHover,
+  handleHoverOn,
+  handleHoverOff,
+}: Props) => {
+  const {
+    boardHeight,
+    boardWidth,
+    boardColor,
+    wallLonger,
+    breadth,
+  } = appConfig;
 
-    const tableWidth = 2 * width - 1;
-    const tableHeight = 2 * height - 1;
-
-    for (let x = 0; x < tableWidth; x++) {
-      let column = [];
-      for (let y = 0; y < tableHeight; y++) {
-        if (x % 2 === 0 && y % 2 === 0) {
-          column.push(Cell({ isPlayer1: false, isPlayer2: false }));
-        } else if (x % 2 === 0 && !(y % 2 === 0)) {
-          column.push(WallHorizontal());
-        } else if (!(x % 2 === 0) && y % 2 === 0) {
-          column.push(WallVertical());
-        } else {
-          column.push(WallIntersect());
-        }
-      }
-      table.push(<tr>{column}</tr>);
-    }
-    return table;
-  };
+  const { cellColor, wallColor } = boardColor;
 
   return (
-    <table>
-      <tbody>{createTable({ height, width })}</tbody>
-    </table>
+    <Pane>
+      {new Array(boardHeight).fill(1).map((_, index1) => {
+        return (
+          <Pane display="flex">
+            {new Array(boardWidth).fill(1).map((_, index2) => {
+              if (index1 % 2 === 0 && index2 % 2 === 0) {
+                return (
+                  <Cell
+                    key={index2}
+                    position={{ x: index2, y: index1 }}
+                    color={cellColor}
+                    width={wallLonger}
+                    height={wallLonger}
+                    isHover={isHover}
+                    move={move}
+                    handleHoverOn={handleHoverOn}
+                    handleHoverOff={handleHoverOff}
+                    history={history}
+                  ></Cell>
+                );
+              } else if (index1 % 2 !== 0 && index2 % 2 === 0) {
+                return (
+                  <WallHorizontal
+                    position={{ x: index1, y: index2 }}
+                    color={wallColor}
+                    width={wallLonger}
+                    height={breadth}
+                    isHover={isHover}
+                    put={put}
+                    handleHoverOn={handleHoverOn}
+                    handleHoverOff={handleHoverOff}
+                    history={history}
+                  ></WallHorizontal>
+                );
+              } else if (index1 % 2 === 0 && index2 % 2 !== 0) {
+                return (
+                  <WallVertical
+                    position={{ x: index1, y: index2 }}
+                    color={wallColor}
+                    width={breadth}
+                    height={wallLonger}
+                    isHover={isHover}
+                    put={put}
+                    handleHoverOn={handleHoverOn}
+                    handleHoverOff={handleHoverOff}
+                    history={history}
+                  ></WallVertical>
+                );
+              } else {
+                return (
+                  <WallIntersect
+                    position={{ x: index1, y: index2 }}
+                    color={wallColor}
+                    width={breadth}
+                    height={breadth}
+                    isHover={isHover}
+                    history={history}
+                  ></WallIntersect>
+                );
+              }
+            })}
+          </Pane>
+        );
+      })}
+    </Pane>
   );
 };
 
