@@ -1,6 +1,6 @@
 import React from "react";
 import { Pane } from "evergreen-ui";
-import { WallColor, History } from "../../Utils";
+import { WallColor, Step } from "../../Utils";
 
 interface Props {
   position: { x: number; y: number };
@@ -11,7 +11,7 @@ interface Props {
   put: (position: { x: number; y: number }) => void;
   handleHoverOn: (position: { x: number; y: number }) => void;
   handleHoverOff: (position: { x: number; y: number }) => void;
-  history: History;
+  step: Step;
 }
 
 const WallHorizontal = ({
@@ -23,15 +23,14 @@ const WallHorizontal = ({
   put,
   handleHoverOn,
   handleHoverOff,
-  history,
+  step,
 }: Props) => {
   const { defaultColor, click, hover } = color;
 
   const { x, y } = position;
   const hoverState = isHover[x][y];
 
-  const currentStep = history[history.length - 1];
-  const { walls } = currentStep;
+  const { walls } = step;
 
   const onState =
     walls.find((wall) => wall.x === x && wall.y === y) === undefined

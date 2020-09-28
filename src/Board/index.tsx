@@ -4,11 +4,11 @@ import WallHorizontal from "./Wall/WallHorizontal";
 import WallVertical from "./Wall/WallVertical";
 import WallIntersect from "./Wall/WallIntersect";
 import { Pane } from "evergreen-ui";
-import { History, AppConfig } from "../Utils";
+import { AppConfig, Step } from "../Utils";
 
 interface Props {
   appConfig: AppConfig;
-  history: History;
+  step: Step;
   move: (position: { x: number; y: number }) => void;
   put: (position: { x: number; y: number }) => void;
   isHover: boolean[][];
@@ -18,7 +18,7 @@ interface Props {
 
 const Board = ({
   appConfig,
-  history,
+  step,
   move,
   put,
   isHover,
@@ -53,7 +53,7 @@ const Board = ({
                     move={move}
                     handleHoverOn={handleHoverOn}
                     handleHoverOff={handleHoverOff}
-                    history={history}
+                    step={step}
                   ></Cell>
                 );
               } else if (index1 % 2 !== 0 && index2 % 2 === 0) {
@@ -67,7 +67,7 @@ const Board = ({
                     put={put}
                     handleHoverOn={handleHoverOn}
                     handleHoverOff={handleHoverOff}
-                    history={history}
+                    step={step}
                   ></WallHorizontal>
                 );
               } else if (index1 % 2 === 0 && index2 % 2 !== 0) {
@@ -81,7 +81,7 @@ const Board = ({
                     put={put}
                     handleHoverOn={handleHoverOn}
                     handleHoverOff={handleHoverOff}
-                    history={history}
+                    step={step}
                   ></WallVertical>
                 );
               } else {
@@ -92,7 +92,7 @@ const Board = ({
                     width={breadth}
                     height={breadth}
                     isHover={isHover}
-                    history={history}
+                    step={step}
                   ></WallIntersect>
                 );
               }
