@@ -9,8 +9,8 @@ interface Props {
   height: number;
   isHover: boolean[][];
   put: (position: { x: number; y: number }) => void;
-  handleHoverOn: (position: { x: number; y: number }) => void;
-  handleHoverOff: (position: { x: number; y: number }) => void;
+  hoverOver: (position: { x: number; y: number }) => void;
+  leave: (position: { x: number; y: number }) => void;
   step: Step;
 }
 
@@ -21,8 +21,8 @@ const WallHorizontal = ({
   height,
   isHover,
   put,
-  handleHoverOn,
-  handleHoverOff,
+  hoverOver,
+  leave,
   step,
 }: Props) => {
   const { defaultColor, click, hover } = color;
@@ -51,10 +51,10 @@ const WallHorizontal = ({
         put(position);
       }}
       onMouseOver={() => {
-        handleHoverOn(position);
+        hoverOver(position);
       }}
       onMouseLeave={() => {
-        handleHoverOff(position);
+        leave(position);
       }}
     ></Pane>
   );
