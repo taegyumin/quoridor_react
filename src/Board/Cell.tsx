@@ -14,8 +14,8 @@ interface Props {
   height: number;
   isHover: boolean[][];
   move: (position: { x: number; y: number }) => void;
-  handleHoverOn: (position: { x: number; y: number }) => void;
-  handleHoverOff: (position: { x: number; y: number }) => void;
+  hoverOver: (position: { x: number; y: number }) => void;
+  leave: (position: { x: number; y: number }) => void;
   step: Step;
 }
 
@@ -26,8 +26,8 @@ const Cell = ({
   height,
   isHover,
   move,
-  handleHoverOn,
-  handleHoverOff,
+  hoverOver,
+  leave,
   step,
 }: Props) => {
   /*
@@ -60,10 +60,10 @@ const Cell = ({
         move(position);
       }}
       onMouseOver={() => {
-        handleHoverOn(position);
+        hoverOver(position);
       }}
       onMouseLeave={() => {
-        handleHoverOff(position);
+        leave(position);
       }}
     >
       <FullCircleIcon

@@ -176,7 +176,7 @@ function App() {
     })
   );
 
-  const handleHoverOn = (position: { x: number; y: number }) => {
+  const hoverOver = (position: { x: number; y: number }) => {
     const temp = new Array(appConfig.boardHeight).fill(false).map((_) => {
       return new Array(appConfig.boardWidth).fill(false);
     });
@@ -215,7 +215,7 @@ function App() {
     setHover(temp);
   };
 
-  const handleHoverOff = (position: { x: number; y: number }) => {
+  const leave = (position: { x: number; y: number }) => {
     const temp = new Array(appConfig.boardHeight).fill(false).map((_) => {
       return new Array(appConfig.boardWidth).fill(false);
     });
@@ -259,8 +259,8 @@ function App() {
           move={move}
           put={put}
           isHover={isHover}
-          handleHoverOn={handleHoverOn}
-          handleHoverOff={handleHoverOff}
+          hoverOver={hoverOver}
+          leave={leave}
         />
         <WallLeftIndicator appConfig={appConfig} history={history} id={1} />
         <button

@@ -12,8 +12,8 @@ interface Props {
   move: (position: { x: number; y: number }) => void;
   put: (position: { x: number; y: number }) => void;
   isHover: boolean[][];
-  handleHoverOn: (position: { x: number; y: number }) => void;
-  handleHoverOff: (position: { x: number; y: number }) => void;
+  hoverOver: (position: { x: number; y: number }) => void;
+  leave: (position: { x: number; y: number }) => void;
 }
 
 const Board = ({
@@ -22,8 +22,8 @@ const Board = ({
   move,
   put,
   isHover,
-  handleHoverOn,
-  handleHoverOff,
+  hoverOver,
+  leave,
 }: Props) => {
   const {
     boardHeight,
@@ -50,8 +50,8 @@ const Board = ({
                     height={wallLonger}
                     isHover={isHover}
                     move={move}
-                    handleHoverOn={handleHoverOn}
-                    handleHoverOff={handleHoverOff}
+                    hoverOver={hoverOver}
+                    leave={leave}
                     step={step}
                   ></Cell>
                 );
@@ -64,8 +64,8 @@ const Board = ({
                     height={breadth}
                     isHover={isHover}
                     put={put}
-                    handleHoverOn={handleHoverOn}
-                    handleHoverOff={handleHoverOff}
+                    hoverOver={hoverOver}
+                    leave={leave}
                     step={step}
                   ></WallHorizontal>
                 );
@@ -78,8 +78,8 @@ const Board = ({
                     height={wallLonger}
                     isHover={isHover}
                     put={put}
-                    handleHoverOn={handleHoverOn}
-                    handleHoverOff={handleHoverOff}
+                    hoverOver={hoverOver}
+                    leave={leave}
                     step={step}
                   ></WallVertical>
                 );
