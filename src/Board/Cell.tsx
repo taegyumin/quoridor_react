@@ -1,6 +1,6 @@
 import React from "react";
 import { Pane, FullCircleIcon } from "evergreen-ui";
-import { CellColor, History } from "../Utils";
+import { CellColor, Step } from "../Utils";
 
 interface isPlayer {
   isPlayer1: boolean;
@@ -16,7 +16,7 @@ interface Props {
   move: (position: { x: number; y: number }) => void;
   handleHoverOn: (position: { x: number; y: number }) => void;
   handleHoverOff: (position: { x: number; y: number }) => void;
-  history: History;
+  step: Step;
 }
 
 const Cell = ({
@@ -28,7 +28,7 @@ const Cell = ({
   move,
   handleHoverOn,
   handleHoverOff,
-  history,
+  step,
 }: Props) => {
   /*
    * 필요한 것: position, move, color (defaultColor, onColor, hoverColor), cellSize, setOn(position), setHover(position)
@@ -37,8 +37,7 @@ const Cell = ({
   const { defaultColor, player0Color, player1Color } = color;
   const { x, y } = position;
 
-  const currentStep = history[history.length - 1];
-  const { player0, player1 } = currentStep;
+  const { player0, player1 } = step;
 
   const on0 = player0.x === x && player0.y === y;
   const on1 = player1.x === x && player1.y === y;

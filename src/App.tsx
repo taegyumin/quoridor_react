@@ -256,7 +256,7 @@ function App() {
         <WallLeftIndicator appConfig={appConfig} history={history} id={0} />
         <Board
           appConfig={appConfig}
-          history={history}
+          step={history[history.length - 1]}
           move={move}
           put={put}
           isHover={isHover}
