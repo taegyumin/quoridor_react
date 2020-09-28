@@ -2,11 +2,6 @@ import React from "react";
 import { Pane, FullCircleIcon } from "evergreen-ui";
 import { CellColor, Step } from "../Utils";
 
-interface isPlayer {
-  isPlayer1: boolean;
-  isPlayer0: boolean;
-}
-
 interface Props {
   position: { x: number; y: number };
   color: CellColor;
