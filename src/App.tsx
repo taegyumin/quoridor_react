@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Pane, Heading, Checkbox, Text, Switch } from "evergreen-ui";
 import styled, { ThemeProvider } from "styled-components";
-import "./App.css";
 import { lightTheme, darkTheme } from "./theme";
 import { GlobalStyle } from "./global-styles";
 import WallLeftIndicator from "./Player/WallLeftIndicator";
