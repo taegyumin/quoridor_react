@@ -37,15 +37,14 @@ const Board = ({
 
   return (
     <Pane>
-      {new Array(boardHeight).fill(1).map((_, index1) => {
+      {new Array(boardHeight).fill(1).map((_, x) => {
         return (
           <Pane display="flex">
-            {new Array(boardWidth).fill(1).map((_, index2) => {
-              if (index1 % 2 === 0 && index2 % 2 === 0) {
+            {new Array(boardWidth).fill(1).map((_, y) => {
+              if (x % 2 === 0 && y % 2 === 0) {
                 return (
                   <Cell
-                    key={index2}
-                    position={{ x: index2, y: index1 }}
+                    position={{ x: y, y: x }}
                     color={cellColor}
                     width={wallLonger}
                     height={wallLonger}
@@ -56,10 +55,10 @@ const Board = ({
                     step={step}
                   ></Cell>
                 );
-              } else if (index1 % 2 !== 0 && index2 % 2 === 0) {
+              } else if (x % 2 !== 0 && y % 2 === 0) {
                 return (
                   <WallHorizontal
-                    position={{ x: index1, y: index2 }}
+                    position={{ x, y }}
                     color={wallColor}
                     width={wallLonger}
                     height={breadth}
@@ -70,10 +69,10 @@ const Board = ({
                     step={step}
                   ></WallHorizontal>
                 );
-              } else if (index1 % 2 === 0 && index2 % 2 !== 0) {
+              } else if (x % 2 === 0 && y % 2 !== 0) {
                 return (
                   <WallVertical
-                    position={{ x: index1, y: index2 }}
+                    position={{ x, y }}
                     color={wallColor}
                     width={breadth}
                     height={wallLonger}
@@ -87,7 +86,7 @@ const Board = ({
               } else {
                 return (
                   <WallIntersect
-                    position={{ x: index1, y: index2 }}
+                    position={{ x, y }}
                     color={wallColor}
                     width={breadth}
                     height={breadth}
