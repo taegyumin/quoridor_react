@@ -252,7 +252,6 @@ function App() {
             label="Show Side Tab"
           />
         </Header> */}
-        <WallLeftIndicator appConfig={appConfig} history={history} id={0} />
         <Board
           appConfig={appConfig}
           step={history[history.length - 1]}
@@ -262,7 +261,6 @@ function App() {
           hoverOver={hoverOver}
           leave={leave}
         />
-        <WallLeftIndicator appConfig={appConfig} history={history} id={1} />
         <button
           onClick={() => {
             toggleTheme();
@@ -271,6 +269,16 @@ function App() {
           Dark Mode
         </button>
         {/* {isSideTabShown && (
+            <WallLeftIndicator
+              appConfig={appConfig}
+              step={history[history.length - 1]}
+              id={0}
+            />
+            <WallLeftIndicator
+              appConfig={appConfig}
+              step={history[history.length - 1]}
+              id={1}
+            />
           <SectionTab borderLeft>
             <Switch
               checked={isChecked}

@@ -1,20 +1,19 @@
 import React from "react";
 import { Pane, Text } from "evergreen-ui";
-import { AppConfig, History } from "../Utils";
+import { AppConfig, Step } from "../Utils";
 
 interface Props {
   appConfig: AppConfig;
-  history: History;
+  step: Step;
   id: number;
 }
 
-const WallLeftIndicator = ({ appConfig, history, id }: Props) => {
+const WallLeftIndicator = ({ appConfig, step, id }: Props) => {
+  const { stepNumber } = step;
   const { boardColor, wallLonger, breadth } = appConfig;
   const { cellColor } = boardColor;
   const { player0Color, player1Color } = cellColor;
 
-  const currentStep = history[history.length - 1];
-  const { stepNumber } = currentStep;
 
   const { remainingWalls } =
     id === 0
