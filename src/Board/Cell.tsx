@@ -1,6 +1,6 @@
 import React from "react";
 import { Pane, FullCircleIcon } from "evergreen-ui";
-import { CellColor, Step } from "../Utils";
+import { CellColor, Step, isEven } from "../Utils";
 
 interface Props {
   position: { x: number; y: number };

@@ -4,7 +4,7 @@ import WallHorizontal from "./Wall/WallHorizontal";
 import WallVertical from "./Wall/WallVertical";
 import WallIntersect from "./Wall/WallIntersect";
 import { Pane } from "evergreen-ui";
-import { AppConfig, Step } from "../Utils";
+import { AppConfig, Step, isEven } from "../Utils";
 
 interface Props {
   appConfig: AppConfig;
@@ -41,7 +41,7 @@ const Board = ({
         return (
           <Pane display="flex">
             {new Array(boardWidth).fill(1).map((_, y) => {
-              if (x % 2 === 0 && y % 2 === 0) {
+              if (isEven(x) && isEven(y)) {
                 return (
                   <Cell
                     position={{ x: y, y: x }}
@@ -55,7 +55,7 @@ const Board = ({
                     step={step}
                   ></Cell>
                 );
-              } else if (x % 2 !== 0 && y % 2 === 0) {
+              } else if (!isEven(x) && isEven(y)) {
                 return (
                   <WallHorizontal
                     position={{ x, y }}
@@ -69,7 +69,7 @@ const Board = ({
                     step={step}
                   ></WallHorizontal>
                 );
-              } else if (x % 2 === 0 && y % 2 !== 0) {
+              } else if (isEven(x) && !isEven(y)) {
                 return (
                   <WallVertical
                     position={{ x, y }}
