@@ -49,10 +49,10 @@ const Board = ({
                     width={wallLonger}
                     height={wallLonger}
                     isHover={isHover}
-                    move={move}
+                    step={step}
                     hoverOver={hoverOver}
                     leave={leave}
-                    step={step}
+                    move={move}
                   ></Cell>
                 );
               } else if (!isEven(x) && isEven(y)) {
@@ -63,10 +63,10 @@ const Board = ({
                     width={wallLonger}
                     height={breadth}
                     isHover={isHover}
-                    put={put}
+                    step={step}
                     hoverOver={hoverOver}
                     leave={leave}
-                    step={step}
+                    put={put}
                   ></WallHorizontal>
                 );
               } else if (isEven(x) && !isEven(y)) {
@@ -77,10 +77,10 @@ const Board = ({
                     width={breadth}
                     height={wallLonger}
                     isHover={isHover}
-                    put={put}
+                    step={step}
                     hoverOver={hoverOver}
                     leave={leave}
-                    step={step}
+                    put={put}
                   ></WallVertical>
                 );
               } else {
