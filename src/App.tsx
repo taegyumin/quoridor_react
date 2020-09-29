@@ -5,7 +5,7 @@ import { lightTheme, darkTheme } from "./theme";
 import { GlobalStyle } from "./global-styles";
 import WallLeftIndicator from "./Player/WallLeftIndicator";
 import Board from "./Board";
-import { AppConfig, Color, History } from "./Utils";
+import { AppConfig, Color, History, isEven } from "./Utils";
 import { v4 as uuid } from "uuid";
 
 const Layout = styled(Pane)`
@@ -109,7 +109,7 @@ function App() {
     const currentStep = history[history.length - 1];
     const { stepNumber } = currentStep;
 
-    if (stepNumber % 2 !== 0) {
+    if (isEven(stepNumber)) {
       if (
         Math.abs(currentStep.player1.x - position.x) +
           Math.abs(currentStep.player1.y - position.y) ===
@@ -153,17 +153,17 @@ function App() {
     }
 
     const { x, y } = position;
-    if (x % 2 !== 0 && y % 2 === 0) {
       currentStep.walls.push(position);
       currentStep.walls.push({ x: x, y: y + 1 });
       currentStep.walls.push({ x: x, y: y + 2 });
+    if (!isEven(x) && isEven(y)) {
       currentStep.stepNumber += 1;
       const temp = [...history, currentStep];
       setHistory(temp);
-    } else if (x % 2 === 0 && y % 2 !== 0) {
       currentStep.walls.push(position);
       currentStep.walls.push({ x: x + 1, y: y });
       currentStep.walls.push({ x: x + 2, y: y });
+    } else if (isEven(x) && !isEven(y)) {
       currentStep.stepNumber += 1;
       const temp = [...history, currentStep];
       setHistory(temp);
@@ -185,10 +185,10 @@ function App() {
 
     const { x, y } = position;
     console.log(x, y);
-    if (x % 2 === 0 && y % 2 === 0) {
+    if (isEven(x) && isEven(y)) {
       //Cell
       temp[x][y] = true;
-    } else if (x % 2 !== 0 && y % 2 === 0) {
+    } else if (!isEven(x) && isEven(y)) {
       //wallHorizontal
       if (y === 16) {
         temp[x][y] = true;
@@ -199,7 +199,7 @@ function App() {
         temp[x][y + 1] = true;
         temp[x][y + 2] = true;
       }
-    } else if (x % 2 === 0 && y % 2 !== 0) {
+    } else if (isEven(x) && !isEven(y)) {
       //wallVertical
       if (x === 16) {
         temp[x][y] = true;

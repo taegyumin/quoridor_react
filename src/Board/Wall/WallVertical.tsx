@@ -1,6 +1,6 @@
 import React from "react";
 import { Pane } from "evergreen-ui";
-import { WallColor, Step } from "../../Utils";
+import { WallColor, Step, isEven } from "../../Utils";
 
 interface Props {
   position: { x: number; y: number };
