@@ -1,25 +1,31 @@
 import React, { useState } from "react";
-import { Pane, Heading, Checkbox, Text, Switch } from "evergreen-ui";
-import styled, { ThemeProvider } from "styled-components";
-import { lightTheme, darkTheme } from "./theme";
+import { Pane } from "evergreen-ui";
 import { GlobalStyle } from "./global-styles";
-import WallLeftIndicator from "./Player/WallLeftIndicator";
+// import { lightTheme, darkTheme } from "./theme";
+import styled, { ThemeProvider } from "styled-components";
 import Board from "./Board";
-import { AppConfig, Color, History, isEven } from "./Utils";
+import Winner from "./Winner";
 import { v4 as uuid } from "uuid";
+import HistoryBar from "./HistoryBar";
+import ThemeController from "./ThemeController";
+import WallLeftIndicator from "./Player/WallLeftIndicator";
+import {
+  AppConfig,
+  History,
+  Step,
+  isEven,
+  lightTheme,
+  darkTheme,
+  ThemeType,
+  canMove,
+  canPut,
+} from "./Utils";
 
 const Layout = styled(Pane)`
   width: 100%;
   height: 100%;
   display: flex;
-  flex-direction: column;
-`;
-
-const SectionTab = styled(Pane)`
-  flex: 1;
-  width: 20%;
-  flex-shrink: 0;
-  padding: 24px;
+  flex-direction: row;
 `;
 
 const Section = styled(Pane)`
@@ -29,63 +35,17 @@ const Section = styled(Pane)`
   padding: 24px;
 `;
 
-const Header = styled(Pane)`
-  display: flex;
-  padding: 10px 24px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-`;
-
-const gameId = uuid();
-
-// export const history: History = [];
 const appConfig: AppConfig = {
+  gameId: uuid(),
   boardHeight: 17,
   boardWidth: 17,
-  // boardColor: {
-  //   wallColor: {
-  //     defaultColor: Color.N3,
-  //     hover: Color.N5,
-  //     click: Color.N10,
-  //   },
-  //   cellColor: {
-  //     defaultColor: Color.white,
-  //     player1Color: {
-  //       hover: Color.N5,
-  //       click: Color.N10,
-  //     },
-  //     player0Color: {
-  //       hover: Color.B6,
-  //       click: Color.B9,
-  //     },
-  //   },
-  // },
-  boardColor: {
-    wallColor: {
-      defaultColor: Color.NotionWhite,
-      hover: Color.N5,
-      click: Color.NotionDark,
-    },
-    cellColor: {
-      defaultColor: Color.white,
-      player1Color: {
-        hover: Color.RedLight,
-        click: Color.RedBase,
-      },
-      player0Color: {
-        hover: Color.YellowLight,
-        click: Color.YellowBase,
-      },
-    },
-  },
   wallLonger: 60,
   breadth: 12,
-  numberOfPlayers: 2,
   numberOfWalls: 10,
   lengthOfWalls: 2,
+  boardColor: lightTheme,
 };
+
 const initialStep = {
   player0: {
     x: (appConfig.boardWidth - 1) / 2,
@@ -102,72 +62,116 @@ const initialStep = {
 };
 
 function App() {
-  const [isSideTabShown, setSideTabShown] = useState<boolean>(true);
+  const [isWin, setWin] = useState<boolean>(false);
   const [history, setHistory] = useState<History>([initialStep]);
-
+  const [step, setStep] = useState<Step>(initialStep);
   const move = (position: { x: number; y: number }) => {
-    const currentStep = history[history.length - 1];
-    const { stepNumber } = currentStep;
+    const { stepNumber, player0, player1 } = step;
+    const [...walls] = step.walls;
+
+    const nextStep = {
+      walls: walls,
+      player1: {
+        x: step.player1.x,
+        y: step.player1.y,
+        remainingWalls: step.player1.remainingWalls,
+      },
+      player0: {
+        x: step.player0.x,
+        y: step.player0.y,
+        remainingWalls: step.player0.remainingWalls,
+      },
+      stepNumber: step.stepNumber + 1,
+    };
 
     if (isEven(stepNumber)) {
       if (
-        Math.abs(currentStep.player1.x - position.x) +
-          Math.abs(currentStep.player1.y - position.y) ===
-          2 &&
-        Math.abs(currentStep.player0.x - position.x) +
-          Math.abs(currentStep.player0.y - position.y) !==
-          0
-      ) {
-        currentStep.player1.x = position.x;
-        currentStep.player1.y = position.y;
-        currentStep.stepNumber += 1;
-        const temp = [...history, currentStep];
-        setHistory(temp);
-      }
+        !canMove({
+          desiredPosition: position,
+          opponent: player1,
+          me: player0,
+          walls,
+        })
+      )
+        return;
+      nextStep.player0.x = position.x;
+      nextStep.player0.y = position.y;
     } else {
       if (
-        Math.abs(currentStep.player0.x - position.x) +
-          Math.abs(currentStep.player0.y - position.y) ===
-          2 &&
-        Math.abs(currentStep.player1.x - position.x) +
-          Math.abs(currentStep.player1.y - position.y) !==
-          0
-      ) {
-        currentStep.player0.x = position.x;
-        currentStep.player0.y = position.y;
-        currentStep.stepNumber += 1;
-        const temp = [...history, currentStep];
-        setHistory(temp);
+        !canMove({
+          desiredPosition: position,
+          opponent: player0,
+          me: player1,
+          walls,
+        })
+      )
+        return;
+      nextStep.player1.x = position.x;
+      nextStep.player1.y = position.y;
+    }
+    setStep(nextStep);
+    const newHistory = [...history, nextStep];
+    setHistory(newHistory);
+  };
+  const put = (position: { x: number; y: number }) => {
+    const { stepNumber, player0, player1 } = step;
+    const [...walls] = step.walls;
+    const { x, y } = position;
+
+    const nextStep = {
+      walls,
+      player0: {
+        x: step.player0.x,
+        y: step.player0.y,
+        remainingWalls: step.player0.remainingWalls,
+      },
+      player1: {
+        x: step.player1.x,
+        y: step.player1.y,
+        remainingWalls: step.player1.remainingWalls,
+      },
+      stepNumber: step.stepNumber + 1,
+    };
+
+    const desiredPosition = [];
+
+    if (!isEven(x) && isEven(y)) {
+      //wallVertical
+      if (y === appConfig.boardHeight - 1) {
+        desiredPosition.push({ x, y }, { x, y: y - 1 }, { x, y: y - 2 });
+      } else {
+        desiredPosition.push({ x, y }, { x, y: y + 1 }, { x, y: y + 2 });
+      }
+    } else if (isEven(x) && !isEven(y)) {
+      //wallHorizontal
+      if (x === appConfig.boardWidth - 1) {
+        desiredPosition.push({ x, y }, { x: x - 1, y }, { x: x - 2, y });
+      } else {
+        desiredPosition.push({ x, y }, { x: x + 1, y }, { x: x + 2, y });
       }
     }
-  };
 
-  const put = (position: { x: number; y: number }) => {
-    const currentStep = history[history.length - 1];
-    const { stepNumber } = currentStep;
+    if (
+      !canPut({
+        desiredPosition,
+        walls,
+        player0Position: { x: player0.x, y: player0.y },
+        player1Position: { x: player1.x, y: player1.y },
+      })
+    )
+      return;
 
-    if (stepNumber % 2 !== 0) {
-      currentStep.player1.remainingWalls -= 1;
+    if (isEven(stepNumber)) {
+      if (step.player0.remainingWalls === 0) return;
+      nextStep.player0.remainingWalls -= 1;
     } else {
-      currentStep.player0.remainingWalls -= 1;
+      if (step.player1.remainingWalls === 0) return;
+      nextStep.player1.remainingWalls -= 1;
     }
-
-    const { x, y } = position;
-      currentStep.walls.push(position);
-      currentStep.walls.push({ x: x, y: y + 1 });
-      currentStep.walls.push({ x: x, y: y + 2 });
-    if (!isEven(x) && isEven(y)) {
-      currentStep.stepNumber += 1;
-      const temp = [...history, currentStep];
-      setHistory(temp);
-      currentStep.walls.push(position);
-      currentStep.walls.push({ x: x + 1, y: y });
-      currentStep.walls.push({ x: x + 2, y: y });
-    } else if (isEven(x) && !isEven(y)) {
-      currentStep.stepNumber += 1;
-      const temp = [...history, currentStep];
-      setHistory(temp);
-    }
+    nextStep.walls = [...walls, ...desiredPosition];
+    setStep(nextStep);
+    const newHistory = [...history, nextStep];
+    setHistory(newHistory);
   };
 
   const [isHover, setHover] = useState<boolean[][]>(
@@ -175,22 +179,18 @@ function App() {
       return new Array(appConfig.boardWidth).fill(false);
     })
   );
-
   const hoverOver = (position: { x: number; y: number }) => {
     const temp = new Array(appConfig.boardHeight).fill(false).map((_) => {
       return new Array(appConfig.boardWidth).fill(false);
     });
-    const currentStep = history[history.length - 1];
-    const { stepNumber } = currentStep;
 
     const { x, y } = position;
-    console.log(x, y);
     if (isEven(x) && isEven(y)) {
       //Cell
       temp[x][y] = true;
     } else if (!isEven(x) && isEven(y)) {
       //wallHorizontal
-      if (y === 16) {
+      if (y === appConfig.boardHeight - 1) {
         temp[x][y] = true;
         temp[x][y - 1] = true;
         temp[x][y - 2] = true;
@@ -201,7 +201,7 @@ function App() {
       }
     } else if (isEven(x) && !isEven(y)) {
       //wallVertical
-      if (x === 16) {
+      if (x === appConfig.boardWidth - 1) {
         temp[x][y] = true;
         temp[x - 1][y] = true;
         temp[x - 2][y] = true;
@@ -214,84 +214,58 @@ function App() {
     // else: wallIntersect
     setHover(temp);
   };
-
-  const leave = (position: { x: number; y: number }) => {
+  const leave = () => {
     const temp = new Array(appConfig.boardHeight).fill(false).map((_) => {
       return new Array(appConfig.boardWidth).fill(false);
     });
     setHover(temp);
   };
 
-  const [isChecked, setChecked] = useState<boolean>(false);
+  const backward = (): void => {
+    if (history.length <= 1) return;
+    history.pop();
+    setStep(history[history.length - 1]);
+    setHistory(history);
+  };
 
-  const [theme, setTheme] = useState("light");
-
-  const isLight = theme === "light";
-
+  const [isCheck, setCheck] = useState<boolean>(false);
+  const [theme, setTheme] = useState<ThemeType>(ThemeType.light);
   const toggleTheme = () => {
-    if (theme === "light") {
-      setTheme("dark");
+    if (theme === ThemeType.light) {
+      setTheme(ThemeType.dark);
+      appConfig.boardColor = darkTheme;
     } else {
-      setTheme("light");
+      setTheme(ThemeType.light);
+      appConfig.boardColor = lightTheme;
     }
+    setCheck(!isCheck);
   };
 
   return (
-    <ThemeProvider theme={theme === "light" ? lightTheme : darkTheme}>
+    <ThemeProvider theme={theme === ThemeType.light ? lightTheme : darkTheme}>
       <GlobalStyle />
-      <Layout alignItems="center" justifyContent="center">
-        {/* <Header background="blueTint" alignItems="center" borderBottom>
-          <Heading color="default" size={600}>
-            Quoridor React
-          </Heading>
-          <Checkbox
-            marginLeft="auto"
-            size={60}
-            checked={isSideTabShown}
-            onChange={() => setSideTabShown((isShown) => !isShown)}
-            label="Show Side Tab"
-          />
-        </Header> */}
-        <Board
-          appConfig={appConfig}
-          step={history[history.length - 1]}
-          move={move}
-          put={put}
-          isHover={isHover}
-          hoverOver={hoverOver}
-          leave={leave}
-        />
-        <button
-          onClick={() => {
-            toggleTheme();
-          }}
-        >
-          Dark Mode
-        </button>
-        {/* {isSideTabShown && (
-            <WallLeftIndicator
+      <Layout>
+        {isWin ? <Winner isWin={isWin} setWin={setWin}></Winner> : null}
+        <Section>
+          <Pane display="flex" alignItems="center" justifyContent="center">
+            <WallLeftIndicator appConfig={appConfig} step={step} id={0} />
+            <Board
               appConfig={appConfig}
-              step={history[history.length - 1]}
-              id={0}
+              step={step}
+              move={move}
+              put={put}
+              isHover={isHover}
+              hoverOver={hoverOver}
+              leave={leave}
             />
-            <WallLeftIndicator
-              appConfig={appConfig}
-              step={history[history.length - 1]}
-              id={1}
-            />
-          <SectionTab borderLeft>
-            <Switch
-              checked={isChecked}
-              onClick={() => {
-                setChecked(!isChecked);
-                toggleTheme();
-              }}
-            >
-              Dark Mode
-            </Switch>
-            <Text> Dark Mode </Text>
-          </SectionTab>
-        )} */}
+            <WallLeftIndicator appConfig={appConfig} step={step} id={1} />
+          </Pane>
+          <HistoryBar backward={backward} forward={backward}></HistoryBar>
+          <ThemeController
+            isCheck={isCheck}
+            toggleTheme={toggleTheme}
+          ></ThemeController>
+        </Section>
       </Layout>
     </ThemeProvider>
   );

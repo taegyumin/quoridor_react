@@ -3,8 +3,10 @@ import reset from "styled-reset";
 
 export const GlobalStyle = createGlobalStyle`
     ${reset}
-    * {
+    html, body, #root {
     	margin: 0;
+        width: 100%;
+        height: 100%;
         padding: 0;
         box-sizing: border-box;
     }
@@ -14,10 +16,9 @@ export const GlobalStyle = createGlobalStyle`
         display: flex;
         flex-direction: column;
         justify-content: center;
-        height: 100vh;
         margin: 0;
         padding: 0;
-        transition: all 0.25s linear;
+        /* transition: all 0.1s linear; */
         color: ${({ theme }: { theme: any }) => theme.textColor};
     }
     button { 
