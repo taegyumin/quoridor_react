@@ -12,39 +12,35 @@ const WallLeftIndicator = ({ appConfig, step, id }: Props) => {
   const { stepNumber } = step;
   const { boardColor, wallLonger, breadth } = appConfig;
   const { cellColor } = boardColor;
-  const { player0Color, player1Color } = cellColor;
-
-
-  const { remainingWalls } =
-    id === 0
-      ? history[history.length - 1].player0
-      : history[history.length - 1].player1;
+  const { click } = id === 0 ? cellColor.player0 : cellColor.player1;
+  const { remainingWalls } = id === 0 ? step.player0 : step.player1;
 
   return (
     <Pane
-      width={700}
-      height={100}
-      marginTop={20}
-      marginBottom={20}
-      display="flex"
+      width={100}
+      height={(16 + 20) * 10}
+      marginLeft={20}
+      marginRight={20}
       alignItems="center"
       justifyContent="center"
     >
-      {new Array(remainingWalls).fill(1).map((_, idx) => {
-        return (
-          <Pane
-            key={idx}
-            background={id === 0 ? player0Color.click : player1Color.click}
-            float="left"
-            width={breadth}
-            height={wallLonger}
-            margin={10}
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          ></Pane>
-        );
-      })}
+      {new Array(remainingWalls >= 0 ? remainingWalls : 0)
+        .fill(1)
+        .map((_, idx) => {
+          return (
+            <Pane
+              key={idx}
+              background={click}
+              float="left"
+              width={wallLonger}
+              height={breadth}
+              margin={10}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            ></Pane>
+          );
+        })}
       {stepNumber % 2 === id ? <Text>{"YOUR TURN"}</Text> : null}
     </Pane>
   );

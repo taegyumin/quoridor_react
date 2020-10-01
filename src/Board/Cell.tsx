@@ -10,7 +10,7 @@ interface Props {
   isHover: boolean[][];
   move: (position: { x: number; y: number }) => void;
   hoverOver: (position: { x: number; y: number }) => void;
-  leave: (position: { x: number; y: number }) => void;
+  leave: () => void;
   step: Step;
 }
 
@@ -25,32 +25,26 @@ const Cell = ({
   leave,
   step,
 }: Props) => {
-  /*
-   * 필요한 것: position, move, color (defaultColor, onColor, hoverColor), cellSize, setOn(position), setHover(position)
-   *
-   */
-  const { defaultColor, player0Color, player1Color } = color;
+  const { player0, player1, stepNumber } = step;
+  const { background, hover } = isEven(stepNumber)
+    ? color.player1
+    : color.player0;
+
   const { x, y } = position;
-
-  const { player0, player1 } = step;
-
   const on0 = player0.x === x && player0.y === y;
   const on1 = player1.x === x && player1.y === y;
-
   const onState = on0 || on1;
 
   const hoverState = isHover[x][y];
 
   return (
     <Pane
-      key={x}
-      background={defaultColor}
-      float="left"
-      width={width}
-      height={height}
-      display="flex"
+      key={x ** 2 + y}
       alignItems="center"
       justifyContent="center"
+      background={background}
+      width={width}
+      height={height}
       onClick={() => {
         move(position);
       }}
@@ -58,20 +52,18 @@ const Cell = ({
         hoverOver(position);
       }}
       onMouseLeave={() => {
-        leave(position);
+        leave();
       }}
     >
       <FullCircleIcon
         color={
           onState
             ? on0 === true
-              ? player0Color.click
-              : player1Color.click
+              ? color.player0.click
+              : color.player1.click
             : hoverState
-            ? on0 === true
-              ? player0Color.hover
-              : player1Color.hover
-            : defaultColor
+            ? hover
+            : background
         }
         size={width}
       ></FullCircleIcon>
