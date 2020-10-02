@@ -39,7 +39,6 @@ const Cell = ({
 
   return (
     <Pane
-      key={x ** 2 + y}
       alignItems="center"
       justifyContent="center"
       background={background}

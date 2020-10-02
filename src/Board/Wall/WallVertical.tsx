@@ -28,7 +28,6 @@ const WallVertical = ({
   const { background, click, hover } = color;
   return (
     <Pane
-      key={position.x ** 2 + position.y}
       background={isClick ? click : isHover ? hover : background}
       width={width}
       height={height}
