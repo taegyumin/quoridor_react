@@ -41,11 +41,12 @@ const Board = ({
     <Pane>
       {new Array(boardHeight).fill(1).map((_, x) => {
         return (
-          <Pane display="flex">
+          <Pane display="flex" key={x}>
             {new Array(boardWidth).fill(1).map((_, y) => {
               if (isEven(x) && isEven(y)) {
                 return (
                   <Cell
+                    key={x ** 2 + y}
                     position={{ x, y }}
                     color={cellColor}
                     width={wallLonger}
@@ -60,6 +61,7 @@ const Board = ({
               } else if (!isEven(x) && isEven(y)) {
                 return (
                   <WallHorizontal
+                    key={x ** 2 + y}
                     position={{ x, y }}
                     color={is0Turn ? wallColor.player0 : wallColor.player1}
                     width={wallLonger}
@@ -78,6 +80,7 @@ const Board = ({
               } else if (isEven(x) && !isEven(y)) {
                 return (
                   <WallVertical
+                    key={x ** 2 + y}
                     position={{ x, y }}
                     color={is0Turn ? wallColor.player0 : wallColor.player1}
                     width={breadth}
@@ -96,6 +99,7 @@ const Board = ({
               } else {
                 return (
                   <WallIntersect
+                    key={x ** 2 + y}
                     color={is0Turn ? wallColor.player0 : wallColor.player1}
                     width={breadth}
                     height={breadth}
