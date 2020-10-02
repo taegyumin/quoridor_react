@@ -213,6 +213,21 @@ export const canPut = ({
   player0Position: { x: number; y: number };
   player1Position: { x: number; y: number };
 }): boolean => {
-  // TO-DO: 안 되는 케이스 거르기. 페구간 알고리즘 vs 최단거리 알고리즘
+  if (!walls.length) return true;
+
+  if (
+    walls.reduce((acc, wall) => {
+      return (
+        acc ||
+        desiredPosition.reduce((acc2, p) => {
+          return acc2 || (p.x === wall.x && p.y === wall.y);
+        }, false)
+      );
+    }, false)
+  )
+    return false;
+
+  // 플레이어가 속한 폐구간이 생기지 않도록 거르기. 페구간 알고리즘 vs 최단거리 알고리즘
+
   return true;
 };
