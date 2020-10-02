@@ -21,12 +21,17 @@ export enum Color {
   RedLight = "#FAE2E2",
   YellowBase = "#F7D154",
   YellowLight = "#FBE6A2",
+  White = "#FFFFFF",
+  Black = "#000000",
+  Hex = "#2F3437",
+  eb = "#ebebeb",
+  b8 = "#6B8096",
 }
 
 export const lightTheme = {
-  bgColor: "#ffffff",
-  textColor: "#000000",
-  toggleBorder: "#FFF",
+  bgColor: Color.White,
+  textColor: Color.Black,
+  toggleBorder: Color.Black,
   gradient: "linear-gradient(#39598A, #79D7ED)",
   wallColor: {
     player1: {
@@ -55,20 +60,20 @@ export const lightTheme = {
 };
 
 export const darkTheme = {
-  bgColor: "#2F3437",
-  textColor: "#ebebeb",
-  toggleBorder: "#6B8096",
+  bgColor: Color.Hex,
+  textColor: Color.eb,
+  toggleBorder: Color.b8,
   gradient: "linear-gradient(#091236, #1E215D)",
   wallColor: {
     player1: {
       background: Color.N9,
       hover: Color.N5,
-      click: Color.N3,
+      click: Color.Black,
     },
     player0: {
       background: Color.N9,
       hover: Color.N5,
-      click: Color.N3,
+      click: Color.Black,
     },
   },
   cellColor: {
@@ -98,6 +103,10 @@ export enum ThemeType {
 export type BoardColor = {
   wallColor: WallColor;
   cellColor: CellColor;
+  bgColor: Color;
+  textColor: Color;
+  toggleBorder: Color;
+  gradient: string;
 };
 
 export type PlayerColor = {
