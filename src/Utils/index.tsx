@@ -135,6 +135,8 @@ export type AppConfig = {
   numberOfWalls: number;
   lengthOfWalls: number;
   numberOfPlayers?: number;
+  player0Destination: { x: number; y: number }[];
+  player1Destination: { x: number; y: number }[];
 };
 
 export type History = Step[];

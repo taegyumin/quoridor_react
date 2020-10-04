@@ -35,7 +35,7 @@ const Section = styled(Pane)`
   padding: 24px;
 `;
 
-const appConfig: AppConfig = {
+export const appConfig: AppConfig = {
   gameId: uuid(),
   boardHeight: 17,
   boardWidth: 17,
@@ -44,9 +44,15 @@ const appConfig: AppConfig = {
   numberOfWalls: 10,
   lengthOfWalls: 2,
   boardColor: lightTheme,
+  player0Destination: new Array(17).fill(1).map((_, idx) => {
+    return { x: idx, y: 16 };
+  }),
+  player1Destination: new Array(17).fill(1).map((_, idx) => {
+    return { x: idx, y: 0 };
+  }),
 };
 
-const initialStep = {
+export const initialStep = {
   player0: {
     x: (appConfig.boardWidth - 1) / 2,
     y: 0,
@@ -96,6 +102,14 @@ function App() {
         return;
       nextStep.player0.x = position.x;
       nextStep.player0.y = position.y;
+      if (
+        appConfig.player0Destination.find(
+          (dest) =>
+            dest.x === nextStep.player0.x && dest.y === nextStep.player0.y
+        )
+      ) {
+        setWin(true);
+      }
     } else {
       if (
         !canMove({
@@ -108,6 +122,14 @@ function App() {
         return;
       nextStep.player1.x = position.x;
       nextStep.player1.y = position.y;
+      if (
+        appConfig.player1Destination.find(
+          (dest) =>
+            dest.x === nextStep.player1.x && dest.y === nextStep.player1.y
+        )
+      ) {
+        setWin(true);
+      }
     }
     setStep(nextStep);
     const newHistory = [
@@ -254,7 +276,14 @@ function App() {
     <ThemeProvider theme={theme === ThemeType.light ? lightTheme : darkTheme}>
       <GlobalStyle />
       <Layout>
-        {isWin ? <Winner isWin={isWin} setWin={setWin}></Winner> : null}
+        {isWin ? (
+          <Winner
+            isWin={isWin}
+            setWin={setWin}
+            setHistory={setHistory}
+            setStep={setStep}
+          ></Winner>
+        ) : null}
         <Section>
           <Pane display="flex" alignItems="center" justifyContent="center">
             <WallLeftIndicator appConfig={appConfig} step={step} id={0} />
