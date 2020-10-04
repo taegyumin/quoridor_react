@@ -29,7 +29,7 @@ const HistoryBar = ({ backward, forward }: Props) => {
       </Text>
       <DoubleChevronRightIcon
         onClick={() => {
-          backward();
+          forward();
         }}
       ></DoubleChevronRightIcon>
     </Pane>

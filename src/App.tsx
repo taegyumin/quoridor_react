@@ -110,7 +110,10 @@ function App() {
       nextStep.player1.y = position.y;
     }
     setStep(nextStep);
-    const newHistory = [...history, nextStep];
+    const newHistory = [
+      ...history.filter((step) => step.stepNumber < nextStep.stepNumber),
+      nextStep,
+    ];
     setHistory(newHistory);
   };
   const put = (position: { x: number; y: number }) => {
@@ -136,14 +139,14 @@ function App() {
     const desiredPosition = [];
 
     if (!isEven(x) && isEven(y)) {
-      //wallVertical
+      //wallHorizontal
       if (y === appConfig.boardHeight - 1) {
         desiredPosition.push({ x, y }, { x, y: y - 1 }, { x, y: y - 2 });
       } else {
         desiredPosition.push({ x, y }, { x, y: y + 1 }, { x, y: y + 2 });
       }
     } else if (isEven(x) && !isEven(y)) {
-      //wallHorizontal
+      //wallVertical
       if (x === appConfig.boardWidth - 1) {
         desiredPosition.push({ x, y }, { x: x - 1, y }, { x: x - 2, y });
       } else {
@@ -170,7 +173,10 @@ function App() {
     }
     nextStep.walls = [...walls, ...desiredPosition];
     setStep(nextStep);
-    const newHistory = [...history, nextStep];
+    const newHistory = [
+      ...history.filter((step) => step.stepNumber < nextStep.stepNumber),
+      nextStep,
+    ];
     setHistory(newHistory);
   };
 
@@ -222,10 +228,13 @@ function App() {
   };
 
   const backward = (): void => {
-    if (history.length <= 1) return;
-    history.pop();
-    setStep(history[history.length - 1]);
-    setHistory(history);
+    if (step.stepNumber === 0) return;
+    setStep(history[step.stepNumber - 1]);
+  };
+
+  const forward = (): void => {
+    if (history.length <= step.stepNumber + 1) return;
+    setStep(history[step.stepNumber + 1]);
   };
 
   const [isCheck, setCheck] = useState<boolean>(false);
@@ -260,7 +269,7 @@ function App() {
             />
             <WallLeftIndicator appConfig={appConfig} step={step} id={1} />
           </Pane>
-          <HistoryBar backward={backward} forward={backward}></HistoryBar>
+          <HistoryBar backward={backward} forward={forward}></HistoryBar>
           <ThemeController
             isCheck={isCheck}
             toggleTheme={toggleTheme}
