@@ -174,6 +174,29 @@ export const canMove = ({
   desiredPosition,
   walls,
 }: Props): boolean => {
+  if (Math.abs(me.x - opponent.x) + Math.abs(me.y - opponent.y) === 2) {
+    if (
+      Math.abs(me.x - desiredPosition.x) +
+        Math.abs(me.y - desiredPosition.y) ===
+        4 &&
+      me.x + desiredPosition.x === opponent.x * 2 &&
+      me.y + desiredPosition.y === opponent.y * 2
+    )
+      return true;
+  } else {
+    if (
+      walls.find(
+        (wall) =>
+          wall.x === (me.x + desiredPosition.x) / 2 &&
+          wall.y === (me.y + desiredPosition.y) / 2
+      )
+        ? true
+        : false
+    ) {
+      //TO-DO: Get positions where walls can block moving. Then verify that there is a wall at the position.
+      return false;
+    }
+  }
   if (
     Math.abs(me.x - desiredPosition.x) + Math.abs(me.y - desiredPosition.y) !==
     2
@@ -181,23 +204,9 @@ export const canMove = ({
     //TO-DO: replace RHS 2 with each player's stepSize in appConfig.
     return false;
 
-  if (
-    Math.abs(opponent.x - desiredPosition.x) +
-      Math.abs(opponent.y - desiredPosition.y) ===
-    0
-  )
-    return false;
+  return true;
+};
 
-  if (
-    walls.find(
-      (wall) =>
-        wall.x === (me.x + desiredPosition.x) / 2 &&
-        wall.y === (me.y + desiredPosition.y) / 2
-    )
-      ? true
-      : false
-  ) {
-    //TO-DO: Get positions where walls can block moving. Then verify that there is a wall at the position.
     return false;
   }
 
