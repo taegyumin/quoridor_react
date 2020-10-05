@@ -1,19 +1,29 @@
 import React from "react";
 import { Pane, Dialog } from "evergreen-ui";
+import { History, Step } from "./Utils";
+import { initialStep } from "./App";
 
 interface Props {
   isWin: boolean;
   setWin: (isWin: boolean) => void;
+  setHistory: (history: History) => void;
+  setStep: (step: Step) => void;
 }
 
-const Winner = ({ isWin, setWin }: Props) => {
+const Winner = ({ isWin, setWin, setHistory, setStep }: Props) => {
   return (
     <Pane>
       <Dialog
         isShown={isWin}
-        onCloseComplete={() => setWin(false)}
+        onCancel={() => setWin(false)}
+        cancelLabel="Back to board"
         hasHeader={false}
-        onConfirm={() => setWin(false)}
+        onConfirm={() => {
+          setHistory([initialStep]);
+          setStep(initialStep);
+          setWin(false);
+        }}
+        confirmLabel="Restart"
       >
         <Pane
           height={100}

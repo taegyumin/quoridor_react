@@ -35,7 +35,7 @@ const Section = styled(Pane)`
   padding: 24px;
 `;
 
-const appConfig: AppConfig = {
+export const appConfig: AppConfig = {
   gameId: uuid(),
   boardHeight: 17,
   boardWidth: 17,
@@ -44,6 +44,12 @@ const appConfig: AppConfig = {
   numberOfWalls: 10,
   lengthOfWalls: 2,
   boardColor: lightTheme,
+  player0Destination: new Array(17).fill(1).map((_, idx) => {
+    return { x: idx, y: 16 };
+  }),
+  player1Destination: new Array(17).fill(1).map((_, idx) => {
+    return { x: idx, y: 0 };
+  }),
 };
 
 export const initialStep = {
@@ -96,6 +102,14 @@ function App() {
         return;
       nextStep.player0.x = position.x;
       nextStep.player0.y = position.y;
+      if (
+        appConfig.player0Destination.find(
+          (dest) =>
+            dest.x === nextStep.player0.x && dest.y === nextStep.player0.y
+        )
+      ) {
+        setWin(true);
+      }
     } else {
       if (
         !canMove({
@@ -108,9 +122,20 @@ function App() {
         return;
       nextStep.player1.x = position.x;
       nextStep.player1.y = position.y;
+      if (
+        appConfig.player1Destination.find(
+          (dest) =>
+            dest.x === nextStep.player1.x && dest.y === nextStep.player1.y
+        )
+      ) {
+        setWin(true);
+      }
     }
     setStep(nextStep);
-    const newHistory = [...history, nextStep];
+    const newHistory = [
+      ...history.filter((step) => step.stepNumber < nextStep.stepNumber),
+      nextStep,
+    ];
     setHistory(newHistory);
   };
   const put = (position: { x: number; y: number }) => {
@@ -136,14 +161,14 @@ function App() {
     const desiredPosition = [];
 
     if (!isEven(x) && isEven(y)) {
-      //wallVertical
+      //wallHorizontal
       if (y === appConfig.boardHeight - 1) {
         desiredPosition.push({ x, y }, { x, y: y - 1 }, { x, y: y - 2 });
       } else {
         desiredPosition.push({ x, y }, { x, y: y + 1 }, { x, y: y + 2 });
       }
     } else if (isEven(x) && !isEven(y)) {
-      //wallHorizontal
+      //wallVertical
       if (x === appConfig.boardWidth - 1) {
         desiredPosition.push({ x, y }, { x: x - 1, y }, { x: x - 2, y });
       } else {
@@ -170,7 +195,10 @@ function App() {
     }
     nextStep.walls = [...walls, ...desiredPosition];
     setStep(nextStep);
-    const newHistory = [...history, nextStep];
+    const newHistory = [
+      ...history.filter((step) => step.stepNumber < nextStep.stepNumber),
+      nextStep,
+    ];
     setHistory(newHistory);
   };
 
@@ -222,10 +250,13 @@ function App() {
   };
 
   const backward = (): void => {
-    if (history.length <= 1) return;
-    history.pop();
-    setStep(history[history.length - 1]);
-    setHistory(history);
+    if (step.stepNumber === 0) return;
+    setStep(history[step.stepNumber - 1]);
+  };
+
+  const forward = (): void => {
+    if (history.length <= step.stepNumber + 1) return;
+    setStep(history[step.stepNumber + 1]);
   };
 
   const [isCheck, setCheck] = useState<boolean>(false);
@@ -245,7 +276,14 @@ function App() {
     <ThemeProvider theme={theme === ThemeType.light ? lightTheme : darkTheme}>
       <GlobalStyle />
       <Layout>
-        {isWin ? <Winner isWin={isWin} setWin={setWin}></Winner> : null}
+        {isWin ? (
+          <Winner
+            isWin={isWin}
+            setWin={setWin}
+            setHistory={setHistory}
+            setStep={setStep}
+          ></Winner>
+        ) : null}
         <Section>
           <Pane display="flex" alignItems="center" justifyContent="center">
             <WallLeftIndicator appConfig={appConfig} step={step} id={0} />
@@ -260,7 +298,7 @@ function App() {
             />
             <WallLeftIndicator appConfig={appConfig} step={step} id={1} />
           </Pane>
-          <HistoryBar backward={backward} forward={backward}></HistoryBar>
+          <HistoryBar backward={backward} forward={forward}></HistoryBar>
           <ThemeController
             isCheck={isCheck}
             toggleTheme={toggleTheme}
