@@ -16,7 +16,7 @@ interface Props {
   leave: () => void;
 }
 
-const Board = ({
+export const Board = ({
   appConfig,
   step,
   move,

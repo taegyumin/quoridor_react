@@ -1,3 +1,8 @@
+import { initialStep } from "../App"
+import {Board} from "../Board"
+
+//import console = require("console");
+
 export type Player = {
   id: number;
   numOfWallLeft: number;
@@ -238,7 +243,302 @@ export const canPut = ({
   )
     return false;
 
-  // 플레이어가 속한 폐구간이 생기지 않도록 거르기. 페구간 알고리즘 vs 최단거리 알고리즘
+
+
+
+  
+
+
+  let exploredCells0 = new Set<{x: number; y: number}>();
+  exploredCells0.clear();
+  exploredCells0.add({x: player0Position.x, y: player0Position.y});
+
+  let exploredCells1 = new Set<{x: number; y: number}>();
+  exploredCells1.add({x: player1Position.x, y: player1Position.y});
+  
+  const finishLineCells0 : {x: number; y: number}[] = [];
+  var num; 
+  for (num = 0; num < 9; num+=2){
+    finishLineCells0.push({x: num, y: 16});
+  }
+  
+  const finishLineCells1 : {x: number; y: number}[] = [];
+  var num2; 
+  for (num2 = 0; num2 < 9; num2+=2){
+    finishLineCells1.push({x: num2, y: 0});
+  }
+  
+  let newPathsFound0: number = 1;
+  const nextStepWalls: {x: number; y: number}[] = [...walls, ...desiredPosition];
+
+  function exploreCells(value: { x: number; y: number; }, value2: { x: number; y: number; }, set: Set<{ x: number; y: number; }>)
+  {
+    console.log('explore')
+    if (!set.has({x: value.x, y: value.y + 2})){
+    if(value.y + 2 <= 16){
+    if (canMove({
+        opponent: player1Position,
+        me: player0Position,
+        desiredPosition: {x: value.x, y: (value.y + 2)},
+        walls: nextStepWalls,
+      })
+      ){
+        //if (exploredCells0.add({x: value.x, y: value.y + 2}) ? true : false){
+          exploredCells0.add({x: value.x, y: value.y + 2});
+          newPathsFound0 += 1;
+        //}
+      }
+    }
+  }
+  if (!set.has({x: value.x, y: value.y - 2})){
+      if(value.y - 2 >= 0){
+      if (canMove({
+        opponent: player1Position,
+        me: player0Position,
+        desiredPosition: {x: value.x, y: (value.y - 2)},
+        walls: nextStepWalls,
+      })
+      ){
+        //if (exploredCells0.add({x: value.x, y: value.y - 2}) ? true : false){
+          exploredCells0.add({x: value.x, y: value.y - 2});
+          newPathsFound0 += 1;
+        //}
+      }
+    }
+  }
+  if (!set.has({x: value.x + 2, y: value.y})){
+    if(value.x + 2 <= 16){
+      if (canMove({
+        opponent: player1Position,
+        me: player0Position,
+        desiredPosition: {x: value.x + 2, y: (value.y)},
+        walls: nextStepWalls,
+      })
+      ){
+        //if (exploredCells0.add({x: value.x + 2, y: value.y}) ? true : false){
+          exploredCells0.add({x: value.x + 2, y: value.y});
+          newPathsFound0 += 1;
+        //}
+      }
+    }
+  }
+    if (!set.has({x: value.x - 2, y: value.y})){
+      if(value.x - 2 >= 0){
+      if (canMove({
+        opponent: player1Position,
+        me: player0Position,
+        desiredPosition: {x: value.x - 2, y: (value.y)},
+        walls: nextStepWalls,
+      })
+      ){
+        //if (exploredCells0.add({x: value.x - 2, y: value.y}) ? true : false){
+          exploredCells0.add({x: value.x - 2, y: value.y});
+          newPathsFound0 += 1;
+        //}
+      }
+    }
+  }
+    }
+
+  function checkFinishLine(value: { x: number; y: number; }, value2: { x: number; y: number; }, set: Set<{ x: number; y: number; }>){
+    let num:number;
+    // for (num = 0; num < finishLineCells0.length; num++){
+    //   if (value.x === finishLineCells0[num].x && value.y === finishLineCells0[num].y)
+    //   return true;
+    // }
+    if (value.y == 16)
+    return true;
+  }
+
+  while (newPathsFound0 > 0) {
+    newPathsFound0 = 1;
+    exploredCells0.forEach(exploreCells);
+    exploredCells0.forEach(checkFinishLine);
+    newPathsFound0 -= 1;
+  }
+
+  for (num = 0; num < finishLineCells0.length; num++){
+    if (!exploredCells0.has({x: finishLineCells0[num].x, y: finishLineCells0[num].y}))
+    return false;
+  }
+  
+  console.log(exploredCells0);
+
 
   return true;
-};
+};  
+//   // THIS IS HARD-CODED FOR THE HORIZONTAL VIEW, MAKE IT DYNAMIC
+//   //Populating the finish line cells for both players
+//   const finishLineCells0 : {x: number; y: number}[] = [];
+//   var num; 
+//   for (num = 0; num < 9; num+=2){
+//     finishLineCells0.push({x: num, y: 16});
+//   }
+
+//   const finishLineCells1 : {x: number; y: number}[] = [];
+//   var num2; 
+//   for (num2 = 0; num2 < 9; num2+=2){
+//     finishLineCells1.push({x: num2, y: 0});
+//   }
+  
+//   //An array for the next step's set of walls
+//   const nextStepWalls: {x: number; y: number}[] = [...walls, ...desiredPosition];
+  
+//   // const outsideWalls: {x: number; y: number}[] = []
+//   // var num3; 
+//   // for (num2 = 0; num2 < ; num2+=2){
+//   //   finishLineCells1 .push({x: num2, y: 0});
+//   // }
+
+//   let exploredCells0: {x: number; y: number}[] = [];
+//   // let yepeyp = new Set<{x: number; y: number}>();
+//   //exploredCells0.add([player0Position.x, player0Position.y]);
+//   exploredCells0[0] = player0Position;
+//   let exploredCells1: {x: number; y: number}[] = [];
+//   exploredCells1[0] = player1Position;
+
+//   let pathBlocked0: boolean = true;
+//   let pathBlocked1: boolean = true;
+//   let newPathsFound0: number = 1;
+//   let newPathsFound1: number = 1;
+
+//   var counter: number = 0; //FOR REINFORCMENT LEARNING
+
+//   // A loop that searches for a route to the finish line
+//   // The loop does so by checking if unchecked cells could lead to the finish line
+//   // Keep the loop going as long as new cells are being examined (= newPathsFound)
+//   // Do the while loop TWICE for newPathsFound0 and newPathsFound1
+//   var lastIteration: number = 0;
+//   newPathsFound0 = 1;
+//   while (newPathsFound0 > 0) {
+
+//     var i: number;
+//     console.log(lastIteration + 'last iteration num');
+//     let iterationNumber: number = exploredCells0.length
+//     for (i = lastIteration; i < iterationNumber; i++){
+      
+//       counter ++;
+
+//       // Do this if statement for All four Directions
+//       // EXPLORE RIGHT CELL
+//       if (
+//         canMove({
+//           opponent: player1Position,
+//           me: player0Position,
+//           desiredPosition: {x: exploredCells0[i].x, y: (exploredCells0[i].y + 2)},
+//           walls: nextStepWalls,
+//       })
+//       ){
+//         // Checking if at least one newly-explored cell already exists in the exploredCells array.
+//         // If it's not found, log the newly added explored cell
+//         if (!exploredCells0.find(
+//           element => element.x === (exploredCells0[i].x) && element.y === (exploredCells0[i].y + 2)
+//           ))
+//           {
+//             exploredCells0.push({x: exploredCells0[i].x, y: exploredCells0[i].y + 2});
+//             console.log('hi' + counter);
+//             newPathsFound0 += 1; //this makes sure the forloop iterates its searching as long as the variable stays above zero
+//         }
+//       }
+//       // EXPLORE LEFT CELL
+//       if (
+//         canMove({
+//           opponent: player1Position,
+//           me: player0Position,
+//           desiredPosition: {x: exploredCells0[i].x, y: (exploredCells0[i].y - 2)},
+//           walls: nextStepWalls,
+//       })
+//       ){
+//         // Checking if at least one newly-explored cell already exists in the exploredCells array.
+//         // If it's not found, log the newly added explored cell
+//         if (!exploredCells0.find(
+//           element => element.x === (exploredCells0[i].x) && element.y === (exploredCells0[i].y - 2)
+//           ))
+//           {
+//             exploredCells0.push({x: exploredCells0[i].x, y: exploredCells0[i].y - 2});
+            
+//             newPathsFound0 += 1; //this makes sure the forloop iterates its searching as long as the variable stays above zero
+//         }
+//       }
+
+//       // EXPLORE UPWARD CELL
+//       if (
+//         canMove({
+//           opponent: player1Position,
+//           me: player0Position,
+//           desiredPosition: {x: exploredCells0[i].x - 2, y: (exploredCells0[i].y)},
+//           walls: nextStepWalls,
+//       })
+//       ){
+//         // Checking if at least one newly-explored cell already exists in the exploredCells array.
+//         // If it's not found, log the newly added explored cell
+//         if (!exploredCells0.find(
+//           element => element.x === (exploredCells0[i].x - 2) && (element.y === exploredCells0[i].y)
+//           ))
+//           {
+//             exploredCells0.push({x: exploredCells0[i].x - 2, y: exploredCells0[i].y})
+            
+//             newPathsFound0 += 1; //this makes sure the forloop iterates its searching as long as the variable stays above zero
+//         }
+//       }
+
+//       // EXPLORE DOWNWARD CELL
+//       if (
+//         canMove({
+//           opponent: player1Position,
+//           me: player0Position,
+//           desiredPosition: {x: exploredCells0[i].x + 2, y:exploredCells0[i].y},
+//           walls: nextStepWalls,
+//       })
+//       ){
+//         // Checking if at least one newly-explored cell already exists in the exploredCells array.
+//         // If it's not found, log the newly added explored cell
+//         if (!exploredCells0.find(
+//           element => element.x === (exploredCells0[i].x + 2) && (element.y === exploredCells0[i].y)
+//           ))
+//           {
+//             exploredCells0.push({x: exploredCells0[i].x + 2, y: exploredCells0[i].y});
+            
+//             newPathsFound0 += 1; //this makes sure the forloop iterates its searching as long as the variable stays above zero
+//         }
+//       }
+      
+//       // Checking to see if the exploredCells array contains any of the finish line cells
+//       // if (
+//       //   exploredCells0.map((v) => {
+//       //     finishLineCells0.map((vv) =>
+//       //     {console.log(v, vv); return v.x == vv.x && v.y == vv.y; }
+//       //    );
+//       //   }))
+//       // {
+//       //   pathBlocked0 = false;
+//       //   console.log(exploredCells0);
+//       //   console.log('heeey' + newPathsFound0);
+//       //   console.log('what' + finishLineCells0);
+//       //   return true;
+        
+//       // }
+//       newPathsFound0 -= 1; //this makes sure the forloop iterates its searching as long as the variable stays above zero
+//       lastIteration = i;
+//       iterationNumber = exploredCells0.length
+//       console.log(exploredCells0);
+//       console.log('hey' + newPathsFound0);
+      
+//     }
+    
+//   }
+// console.log('hii' + counter);
+//   //DO ANOTHER WHILE LOOP HERE
+
+
+
+//   if (pathBlocked0 == true) {
+//     return false;
+//   }
+//   if (pathBlocked1 == true) {
+//     return false;
+//   }
+  
+  // 플레이어가 속한 폐구간이 생기지 않도록 거르기. 페구간 알고리즘 vs 최단거리 알고리즘
+
+
