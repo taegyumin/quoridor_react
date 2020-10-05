@@ -46,7 +46,7 @@ const appConfig: AppConfig = {
   boardColor: lightTheme,
 };
 
-const initialStep = {
+export const initialStep = {
   player0: {
     x: (appConfig.boardWidth - 1) / 2,
     y: 0,
