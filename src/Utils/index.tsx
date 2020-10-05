@@ -212,11 +212,6 @@ export const canMove = ({
   return true;
 };
 
-    return false;
-  }
-
-  return true;
-};
 
 export const canPut = ({
   desiredPosition,
@@ -364,9 +359,13 @@ export const canPut = ({
   
   console.log(exploredCells0);
 
-
   return true;
 };  
+
+
+
+
+
 //   // THIS IS HARD-CODED FOR THE HORIZONTAL VIEW, MAKE IT DYNAMIC
 //   //Populating the finish line cells for both players
 //   const finishLineCells0 : {x: number; y: number}[] = [];
