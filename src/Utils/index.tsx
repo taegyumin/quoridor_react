@@ -335,12 +335,8 @@ export const canPut = ({
   }
     }
 
-  function checkFinishLine(value: { x: number; y: number; }, value2: { x: number; y: number; }, set: Set<{ x: number; y: number; }>){
-    let num:number;
-    // for (num = 0; num < finishLineCells0.length; num++){
-    //   if (value.x === finishLineCells0[num].x && value.y === finishLineCells0[num].y)
-    //   return true;
-    // }
+  function checkFinishLine(value: { x: number; y: number; })
+  {
     if (value.y == 16)
     return true;
   }
@@ -352,14 +348,14 @@ export const canPut = ({
     newPathsFound0 -= 1;
   }
 
-  for (num = 0; num < finishLineCells0.length; num++){
-    if (!exploredCells0.has({x: finishLineCells0[num].x, y: finishLineCells0[num].y}))
-    return false;
-  }
+  // for (num = 0; num < finishLineCells0.length; num++){
+  //   if (!exploredCells0.has({x: finishLineCells0[num].x, y: finishLineCells0[num].y}))
+  //   return false;
+  // }
   
   console.log(exploredCells0);
 
-  return true;
+  return false;
 };  
 
 
