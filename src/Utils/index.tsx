@@ -319,7 +319,7 @@ export const canPut = ({
           walls: nextStepWalls,
         })
         ){
-          exploredCells0.add({x: value.x - 2, y: value.y});
+          set.add({x: value.x - 2, y: value.y});
           newPathsFound += 1;
         }
       }
