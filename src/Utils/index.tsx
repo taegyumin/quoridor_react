@@ -249,31 +249,33 @@ export const canPut = ({
   exploredCells0.add({x: player0Position.x, y: player0Position.y});
 
   let exploredCells1 = new Set<{x: number; y: number}>();
+  exploredCells1.clear();
   exploredCells1.add({x: player1Position.x, y: player1Position.y});
   
-  const finishLineCells0 : {x: number; y: number}[] = [];
-  var num; 
-  for (num = 0; num < 9; num+=2){
-    finishLineCells0.push({x: num, y: 16});
-  }
-  
-  const finishLineCells1 : {x: number; y: number}[] = [];
-  var num2; 
-  for (num2 = 0; num2 < 9; num2+=2){
-    finishLineCells1.push({x: num2, y: 0});
-  }
-  
   let newPathsFound0: number = 1;
-  const nextStepWalls: {x: number; y: number}[] = [...walls, ...desiredPosition];
+  let newPathsFound1: number = 1;
+  let nextStepWalls: {x: number; y: number}[] = []
+  nextStepWalls = [...walls, ...desiredPosition];
 
-  function exploreCells(value: { x: number; y: number; }, value2: { x: number; y: number; }, set: Set<{ x: number; y: number; }>)
+  let pathIsAvailable0: boolean = false;
+  let pathIsAvailable1: boolean = false;
+
+  function checkForDuplicates(value: { x: number; y: number; }, set: Set<{ x: number; y: number; }>){
+    for (var item of Array.from(set.values())) {
+      if (item.x === value.x && item.y === value.y){
+          return true;
+      }
+    }
+  }
+
+  function exploreCells0(value: { x: number; y: number; }, value2: { x: number; y: number; }, set: Set<{ x: number; y: number; }>)
   {
-    console.log('explore')
-    if (!set.has({x: value.x, y: value.y + 2})){
+
+    if (!checkForDuplicates({x: value.x, y: value.y + 2}, set) == true){
     if(value.y + 2 <= 16){
     if (canMove({
         opponent: player1Position,
-        me: player0Position,
+        me: {x: value.x, y: value.y},
         desiredPosition: {x: value.x, y: (value.y + 2)},
         walls: nextStepWalls,
       })
@@ -285,11 +287,11 @@ export const canPut = ({
       }
     }
   }
-  if (!set.has({x: value.x, y: value.y - 2})){
+  if (!checkForDuplicates({x: value.x, y: value.y - 2}, set) == true){
       if(value.y - 2 >= 0){
       if (canMove({
         opponent: player1Position,
-        me: player0Position,
+        me: {x: value.x, y: value.y},
         desiredPosition: {x: value.x, y: (value.y - 2)},
         walls: nextStepWalls,
       })
@@ -301,11 +303,11 @@ export const canPut = ({
       }
     }
   }
-  if (!set.has({x: value.x + 2, y: value.y})){
+  if (!checkForDuplicates({x: value.x + 2, y: value.y}, set) == true){
     if(value.x + 2 <= 16){
       if (canMove({
         opponent: player1Position,
-        me: player0Position,
+        me: {x: value.x, y: value.y},
         desiredPosition: {x: value.x + 2, y: (value.y)},
         walls: nextStepWalls,
       })
@@ -317,11 +319,11 @@ export const canPut = ({
       }
     }
   }
-    if (!set.has({x: value.x - 2, y: value.y})){
+    if (!checkForDuplicates({x: value.x - 2, y: value.y}, set) == true){
       if(value.x - 2 >= 0){
       if (canMove({
         opponent: player1Position,
-        me: player0Position,
+        me: {x: value.x, y: value.y},
         desiredPosition: {x: value.x - 2, y: (value.y)},
         walls: nextStepWalls,
       })
@@ -335,27 +337,108 @@ export const canPut = ({
   }
     }
 
-  function checkFinishLine(value: { x: number; y: number; })
-  {
-    if (value.y == 16)
-    return true;
-  }
+    function exploreCells1(value: { x: number; y: number; }, value2: { x: number; y: number; }, set: Set<{ x: number; y: number; }>)
+    {
+  
+      if (!checkForDuplicates({x: value.x, y: value.y + 2}, set) == true){
+      if(value.y + 2 <= 16){
+      if (canMove({
+          opponent: player0Position,
+          me: {x: value.x, y: value.y},
+          desiredPosition: {x: value.x, y: (value.y + 2)},
+          walls: nextStepWalls,
+        })
+        ){
+          //if (exploredCells0.add({x: value.x, y: value.y + 2}) ? true : false){
+            exploredCells1.add({x: value.x, y: value.y + 2});
+            newPathsFound1 += 1;
+          //}
+        }
+      }
+    }
+    if (!checkForDuplicates({x: value.x, y: value.y - 2}, set) == true){
+        if(value.y - 2 >= 0){
+        if (canMove({
+          opponent: player0Position,
+          me: {x: value.x, y: value.y},
+          desiredPosition: {x: value.x, y: (value.y - 2)},
+          walls: nextStepWalls,
+        })
+        ){
+          //if (exploredCells0.add({x: value.x, y: value.y - 2}) ? true : false){
+            exploredCells1.add({x: value.x, y: value.y - 2});
+            newPathsFound1 += 1;
+          //}
+        }
+      }
+    }
+    if (!checkForDuplicates({x: value.x + 2, y: value.y}, set) == true){
+      if(value.x + 2 <= 16){
+        if (canMove({
+          opponent: player0Position,
+          me: {x: value.x, y: value.y},
+          desiredPosition: {x: value.x + 2, y: (value.y)},
+          walls: nextStepWalls,
+        })
+        ){
+          //if (exploredCells0.add({x: value.x + 2, y: value.y}) ? true : false){
+            exploredCells1.add({x: value.x + 2, y: value.y});
+            newPathsFound1 += 1;
+          //}
+        }
+      }
+    }
+      if (!checkForDuplicates({x: value.x - 2, y: value.y}, set) == true){
+        if(value.x - 2 >= 0){
+        if (canMove({
+          opponent: player0Position,
+          me: {x: value.x, y: value.y},
+          desiredPosition: {x: value.x - 2, y: (value.y)},
+          walls: nextStepWalls,
+        })
+        ){
+          //if (exploredCells0.add({x: value.x - 2, y: value.y}) ? true : false){
+            exploredCells1.add({x: value.x - 2, y: value.y});
+            newPathsFound1 += 1;
+          //}
+        }
+      }
+    }
+      }
 
+  function checkFinishLine0(value: { x: number; y: number; })
+  {
+    if (value.y === 16){
+    pathIsAvailable0 = true;
+    return true;
+    }
+  }
+  function checkFinishLine1(value: { x: number; y: number; })
+  {
+    if (value.y === 0){
+    pathIsAvailable1 = true;
+    return true;
+    }
+  }
   while (newPathsFound0 > 0) {
     newPathsFound0 = 1;
-    exploredCells0.forEach(exploreCells);
-    exploredCells0.forEach(checkFinishLine);
+    exploredCells0.forEach(exploreCells0);
+    exploredCells0.forEach(checkFinishLine0);
     newPathsFound0 -= 1;
   }
 
-  // for (num = 0; num < finishLineCells0.length; num++){
-  //   if (!exploredCells0.has({x: finishLineCells0[num].x, y: finishLineCells0[num].y}))
-  //   return false;
-  // }
-  
-  console.log(exploredCells0);
+  while (newPathsFound1 > 0) {
+    newPathsFound1 = 1;
+    exploredCells1.forEach(exploreCells1);
+    exploredCells1.forEach(checkFinishLine1);
+    newPathsFound1 -= 1;
+  }
 
-  return false;
+  if (pathIsAvailable0 == false || pathIsAvailable1 == false){
+    return false;}
+    else {
+      return true;
+    }
 };  
 
 
