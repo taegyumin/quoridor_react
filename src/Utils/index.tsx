@@ -263,6 +263,9 @@ export const canPut = ({
       if (item.x === value.x && item.y === value.y){
           return true;
       }
+      else {
+        return false;
+      }
     }
   }
 
@@ -358,7 +361,8 @@ export const canPut = ({
 
   if (pathIsAvailable0 == false || pathIsAvailable1 == false)
   {
-    return false;}
+    return false;
+  }
     else {
       return true;
     }
