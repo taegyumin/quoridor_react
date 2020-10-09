@@ -213,6 +213,36 @@ export const canMove = ({
 };
 
 
+ const canMoveForCanPut = ({
+  opponent,
+  me,
+  desiredPosition,
+  walls,
+}: Props): boolean => {
+
+    if (
+      walls.find(
+        (wall) =>
+          wall.x === (me.x + desiredPosition.x) / 2 &&
+          wall.y === (me.y + desiredPosition.y) / 2
+      )
+        ? true
+        : false
+    ) {
+      //TO-DO: Get positions where walls can block moving. Then verify that there is a wall at the position.
+      return false;
+    }
+  
+  if (
+    Math.abs(me.x - desiredPosition.x) + Math.abs(me.y - desiredPosition.y) !==
+    2
+  )
+    //TO-DO: replace RHS 2 with each player's stepSize in appConfig.
+    return false;
+
+  return true;
+};
+
 export const canPut = ({
   desiredPosition,
   walls,
@@ -270,7 +300,7 @@ export const canPut = ({
   {
     if (!checkForDuplicates({x: value.x, y: value.y + 2}, set) == true){
       if(value.y + 2 <= 16){
-        if (canMove({
+        if (canMoveForCanPut({
           opponent: opponent,
           me: {x: value.x, y: value.y},
           desiredPosition: {x: value.x, y: (value.y + 2)},
@@ -284,7 +314,7 @@ export const canPut = ({
     }
     if (!checkForDuplicates({x: value.x, y: value.y - 2}, set) == true){
       if(value.y - 2 >= 0){
-        if (canMove({
+        if (canMoveForCanPut({
           opponent: opponent,
           me: {x: value.x, y: value.y},
           desiredPosition: {x: value.x, y: (value.y - 2)},
@@ -298,7 +328,7 @@ export const canPut = ({
     }
     if (!checkForDuplicates({x: value.x + 2, y: value.y}, set) == true){
       if(value.x + 2 <= 16){
-        if (canMove({
+        if (canMoveForCanPut({
           opponent: opponent,
           me: {x: value.x, y: value.y},
           desiredPosition: {x: value.x + 2, y: (value.y)},
@@ -312,7 +342,7 @@ export const canPut = ({
     }
     if (!checkForDuplicates({x: value.x - 2, y: value.y}, set) == true){
       if(value.x - 2 >= 0){
-        if (canMove({
+        if (canMoveForCanPut({
           opponent: opponent,
           me: {x: value.x, y: value.y},
           desiredPosition: {x: value.x - 2, y: (value.y)},
