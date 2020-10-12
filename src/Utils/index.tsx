@@ -1,8 +1,3 @@
-import { initialStep } from "../App"
-import {Board} from "../Board"
-
-//import console = require("console");
-
 export type Player = {
   id: number;
   numOfWallLeft: number;
@@ -219,27 +214,25 @@ export const canMove = ({
   return true;
 };
 
-
- const canMoveForCanPut = ({
+const canMoveForCanPut = ({
   opponent,
   me,
   desiredPosition,
   walls,
 }: Props): boolean => {
+  if (
+    walls.find(
+      (wall) =>
+        wall.x === (me.x + desiredPosition.x) / 2 &&
+        wall.y === (me.y + desiredPosition.y) / 2
+    )
+      ? true
+      : false
+  ) {
+    //TO-DO: Get positions where walls can block moving. Then verify that there is a wall at the position.
+    return false;
+  }
 
-    if (
-      walls.find(
-        (wall) =>
-          wall.x === (me.x + desiredPosition.x) / 2 &&
-          wall.y === (me.y + desiredPosition.y) / 2
-      )
-        ? true
-        : false
-    ) {
-      //TO-DO: Get positions where walls can block moving. Then verify that there is a wall at the position.
-      return false;
-    }
-  
   if (
     Math.abs(me.x - desiredPosition.x) + Math.abs(me.y - desiredPosition.y) !==
     2
@@ -275,128 +268,137 @@ export const canPut = ({
   )
     return false;
 
-
-
-
-  let exploredCells0 = new Set<{x: number; y: number}>();
+  let exploredCells0 = new Set<{ x: number; y: number }>();
   exploredCells0.clear();
-  exploredCells0.add({x: player0Position.x, y: player0Position.y});
+  exploredCells0.add({ x: player0Position.x, y: player0Position.y });
 
-  let exploredCells1 = new Set<{x: number; y: number}>();
+  let exploredCells1 = new Set<{ x: number; y: number }>();
   exploredCells1.clear();
-  exploredCells1.add({x: player1Position.x, y: player1Position.y});
-  
+  exploredCells1.add({ x: player1Position.x, y: player1Position.y });
+
   let newPathsFound0: number = 1;
   let newPathsFound1: number = 1;
-  let nextStepWalls: {x: number; y: number}[] = []
+  let nextStepWalls: { x: number; y: number }[] = [];
   nextStepWalls = [...walls, ...desiredPosition];
 
   let pathIsAvailable0: boolean = false;
   let pathIsAvailable1: boolean = false;
 
-  function checkForDuplicates(value: { x: number; y: number; }, set: Set<{ x: number; y: number; }>)
-  {
+  function checkForDuplicates(
+    value: { x: number; y: number },
+    set: Set<{ x: number; y: number }>
+  ) {
     for (var item of Array.from(set.values())) {
-      if (item.x === value.x && item.y === value.y){
-          return true;
+      if (item.x === value.x && item.y === value.y) {
+        return true;
       }
     }
   }
 
-  function exploreCells(opponent: { x: number; y: number; }, newPathsFound: number, value: { x: number; y: number; }, value2: { x: number; y: number; }, set: Set<{ x: number; y: number; }>)
-  {
-    if (!checkForDuplicates({x: value.x, y: value.y + 2}, set) == true){
-      if(value.y + 2 <= 16){
-        if (canMoveForCanPut({
-          opponent: opponent,
-          me: {x: value.x, y: value.y},
-          desiredPosition: {x: value.x, y: (value.y + 2)},
-          walls: nextStepWalls,
-        })
-        ){
-          set.add({x: value.x, y: value.y + 2});
+  function exploreCells(
+    opponent: { x: number; y: number },
+    newPathsFound: number,
+    value: { x: number; y: number },
+    value2: { x: number; y: number },
+    set: Set<{ x: number; y: number }>
+  ) {
+    if (!checkForDuplicates({ x: value.x, y: value.y + 2 }, set) == true) {
+      if (value.y + 2 <= 16) {
+        if (
+          canMoveForCanPut({
+            opponent: opponent,
+            me: { x: value.x, y: value.y },
+            desiredPosition: { x: value.x, y: value.y + 2 },
+            walls: nextStepWalls,
+          })
+        ) {
+          set.add({ x: value.x, y: value.y + 2 });
           newPathsFound += 1;
         }
       }
     }
-    if (!checkForDuplicates({x: value.x, y: value.y - 2}, set) == true){
-      if(value.y - 2 >= 0){
-        if (canMoveForCanPut({
-          opponent: opponent,
-          me: {x: value.x, y: value.y},
-          desiredPosition: {x: value.x, y: (value.y - 2)},
-          walls: nextStepWalls,
-        })
-        ){
-          set.add({x: value.x, y: value.y - 2});
+    if (!checkForDuplicates({ x: value.x, y: value.y - 2 }, set) == true) {
+      if (value.y - 2 >= 0) {
+        if (
+          canMoveForCanPut({
+            opponent: opponent,
+            me: { x: value.x, y: value.y },
+            desiredPosition: { x: value.x, y: value.y - 2 },
+            walls: nextStepWalls,
+          })
+        ) {
+          set.add({ x: value.x, y: value.y - 2 });
           newPathsFound += 1;
         }
       }
     }
-    if (!checkForDuplicates({x: value.x + 2, y: value.y}, set) == true){
-      if(value.x + 2 <= 16){
-        if (canMoveForCanPut({
-          opponent: opponent,
-          me: {x: value.x, y: value.y},
-          desiredPosition: {x: value.x + 2, y: (value.y)},
-          walls: nextStepWalls,
-        })
-        ){
-          set.add({x: value.x + 2, y: value.y});
+    if (!checkForDuplicates({ x: value.x + 2, y: value.y }, set) == true) {
+      if (value.x + 2 <= 16) {
+        if (
+          canMoveForCanPut({
+            opponent: opponent,
+            me: { x: value.x, y: value.y },
+            desiredPosition: { x: value.x + 2, y: value.y },
+            walls: nextStepWalls,
+          })
+        ) {
+          set.add({ x: value.x + 2, y: value.y });
           newPathsFound += 1;
         }
       }
     }
-    if (!checkForDuplicates({x: value.x - 2, y: value.y}, set) == true){
-      if(value.x - 2 >= 0){
-        if (canMoveForCanPut({
-          opponent: opponent,
-          me: {x: value.x, y: value.y},
-          desiredPosition: {x: value.x - 2, y: (value.y)},
-          walls: nextStepWalls,
-        })
-        ){
-          set.add({x: value.x - 2, y: value.y});
+    if (!checkForDuplicates({ x: value.x - 2, y: value.y }, set) == true) {
+      if (value.x - 2 >= 0) {
+        if (
+          canMoveForCanPut({
+            opponent: opponent,
+            me: { x: value.x, y: value.y },
+            desiredPosition: { x: value.x - 2, y: value.y },
+            walls: nextStepWalls,
+          })
+        ) {
+          set.add({ x: value.x - 2, y: value.y });
           newPathsFound += 1;
         }
       }
     }
   }
 
-  function checkFinishLine0(value: { x: number; y: number; })
-  {
-    if (value.y === 16){
-    pathIsAvailable0 = true;
-    return true;
+  function checkFinishLine0(value: { x: number; y: number }) {
+    if (value.y === 16) {
+      pathIsAvailable0 = true;
+      return true;
     }
   }
 
-  function checkFinishLine1(value: { x: number; y: number; })
-  {
-    if (value.y === 0){
-    pathIsAvailable1 = true;
-    return true;
+  function checkFinishLine1(value: { x: number; y: number }) {
+    if (value.y === 0) {
+      pathIsAvailable1 = true;
+      return true;
     }
   }
 
   while (newPathsFound0 > 0) {
     newPathsFound0 = 1;
-    exploredCells0.forEach(exploreCells.bind(null, player1Position, newPathsFound0));
+    exploredCells0.forEach(
+      exploreCells.bind(null, player1Position, newPathsFound0)
+    );
     exploredCells0.forEach(checkFinishLine0);
     newPathsFound0 -= 1;
   }
 
   while (newPathsFound1 > 0) {
     newPathsFound1 = 1;
-    exploredCells1.forEach(exploreCells.bind(null, player0Position, newPathsFound1));
+    exploredCells1.forEach(
+      exploreCells.bind(null, player0Position, newPathsFound1)
+    );
     exploredCells1.forEach(checkFinishLine1);
     newPathsFound1 -= 1;
   }
 
-  if (pathIsAvailable0 == false || pathIsAvailable1 == false)
-  {
-    return false;}
-    else {
-      return true;
-    }
-};  
+  if (pathIsAvailable0 == false || pathIsAvailable1 == false) {
+    return false;
+  } else {
+    return true;
+  }
+};
