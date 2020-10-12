@@ -1,24 +1,15 @@
 import React from "react";
 import { Pane } from "evergreen-ui";
-import { PlayerColor } from "../../Utils";
+import { Color } from "../../Utils";
 
 interface Props {
-  color: PlayerColor;
+  color: Color;
   width: number;
   height: number;
-  isClick: boolean;
-  isHover: boolean;
 }
 
-const WallIntersect = ({ color, width, height, isClick, isHover }: Props) => {
-  const { background, click, hover } = color;
-  return (
-    <Pane
-      background={isClick ? click : isHover ? hover : background}
-      width={width}
-      height={height}
-    ></Pane>
-  );
+const WallIntersect = ({ color, width, height }: Props) => {
+  return <Pane background={color} width={width} height={height}></Pane>;
 };
 
 export default WallIntersect;
