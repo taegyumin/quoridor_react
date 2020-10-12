@@ -179,29 +179,36 @@ export const canMove = ({
   desiredPosition,
   walls,
 }: Props): boolean => {
-  if (Math.abs(me.x - opponent.x) + Math.abs(me.y - opponent.y) === 2) {
-    if (
-      Math.abs(me.x - desiredPosition.x) +
-        Math.abs(me.y - desiredPosition.y) ===
-        4 &&
-      me.x + desiredPosition.x === opponent.x * 2 &&
-      me.y + desiredPosition.y === opponent.y * 2
+  // Q1. 원하는 이동거리가 2인가? 4인가? otherwise인가?
+  // Q2. desiredPosition에 opponent가 있는가?
+  // Q3. desiredPosition과 me 사이에 wall이 존재하는가?
+  // Q4. me과 opponent가 붙어있는가?
+  if (
+    Math.abs(desiredPosition.x - opponent.x) +
+      Math.abs(desiredPosition.y - opponent.y) ===
+    0
+  )
+    return false;
+
+  if (
+    walls.find(
+      (wall) =>
+        (wall.x - me.x) * (wall.x - desiredPosition.x) <= 0 &&
+        (wall.y - me.y) * (wall.y - desiredPosition.y) <= 0
     )
-      return true;
-  } else {
-    if (
-      walls.find(
-        (wall) =>
-          wall.x === (me.x + desiredPosition.x) / 2 &&
-          wall.y === (me.y + desiredPosition.y) / 2
-      )
-        ? true
-        : false
-    ) {
-      //TO-DO: Get positions where walls can block moving. Then verify that there is a wall at the position.
-      return false;
-    }
+  ) {
+    //TO-DO: Get positions where walls can block moving. Then verify that there is a wall at the position.
+    return false;
   }
+
+  if (
+    Math.abs(me.x - desiredPosition.x) + Math.abs(me.y - desiredPosition.y) ===
+      4 &&
+    me.x + desiredPosition.x === opponent.x * 2 &&
+    me.y + desiredPosition.y === opponent.y * 2
+  )
+    return true;
+
   if (
     Math.abs(me.x - desiredPosition.x) + Math.abs(me.y - desiredPosition.y) !==
     2
