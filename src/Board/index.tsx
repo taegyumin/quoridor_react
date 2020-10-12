@@ -4,7 +4,7 @@ import WallHorizontal from "./Wall/WallHorizontal";
 import WallVertical from "./Wall/WallVertical";
 import WallIntersect from "./Wall/WallIntersect";
 import { Pane } from "evergreen-ui";
-import { AppConfig, Step, isEven } from "../Utils";
+import { AppConfig, Step, isEven, WallColor, Color } from "../Utils";
 
 interface Props {
   appConfig: AppConfig;
@@ -37,6 +37,23 @@ export const Board = ({
   const { stepNumber } = step;
   const is0Turn = isEven(stepNumber) ? false : true;
 
+  const selectWallColor = (
+    is0Turn: boolean,
+    wallColor: WallColor,
+    step: Step,
+    position: { x: number; y: number },
+    isHover: boolean
+  ): Color => {
+    const { x, y } = position;
+    const wallColor2 = is0Turn ? wallColor.player0 : wallColor.player1;
+    const isClick = step.walls.find((wall) => wall.x === x && wall.y === y)
+      ? true
+      : false;
+    const { background, hover, click } = wallColor2;
+
+    return isClick ? click : isHover ? hover : background;
+  };
+
   return (
     <Pane>
       {new Array(boardHeight).fill(1).map((_, x) => {
@@ -63,15 +80,15 @@ export const Board = ({
                   <WallHorizontal
                     key={x ** 2 + y}
                     position={{ x, y }}
-                    color={is0Turn ? wallColor.player0 : wallColor.player1}
+                    color={selectWallColor(
+                      is0Turn,
+                      wallColor,
+                      step,
+                      { x, y },
+                      isHover[x][y]
+                    )}
                     width={wallLonger}
                     height={breadth}
-                    isClick={
-                      step.walls.find((wall) => wall.x === x && wall.y === y)
-                        ? true
-                        : false
-                    }
-                    isHover={isHover[x][y]}
                     hoverOver={hoverOver}
                     leave={leave}
                     put={put}
@@ -82,15 +99,15 @@ export const Board = ({
                   <WallVertical
                     key={x ** 2 + y}
                     position={{ x, y }}
-                    color={is0Turn ? wallColor.player0 : wallColor.player1}
+                    color={selectWallColor(
+                      is0Turn,
+                      wallColor,
+                      step,
+                      { x, y },
+                      isHover[x][y]
+                    )}
                     width={breadth}
                     height={wallLonger}
-                    isClick={
-                      step.walls.find((wall) => wall.x === x && wall.y === y)
-                        ? true
-                        : false
-                    }
-                    isHover={isHover[x][y]}
                     hoverOver={hoverOver}
                     leave={leave}
                     put={put}
@@ -100,15 +117,15 @@ export const Board = ({
                 return (
                   <WallIntersect
                     key={x ** 2 + y}
-                    color={is0Turn ? wallColor.player0 : wallColor.player1}
+                    color={selectWallColor(
+                      is0Turn,
+                      wallColor,
+                      step,
+                      { x, y },
+                      isHover[x][y]
+                    )}
                     width={breadth}
                     height={breadth}
-                    isClick={
-                      step.walls.find((wall) => wall.x === x && wall.y === y)
-                        ? true
-                        : false
-                    }
-                    isHover={isHover[x][y]}
                   ></WallIntersect>
                 );
               }
