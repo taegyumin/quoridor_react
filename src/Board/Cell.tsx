@@ -1,7 +1,7 @@
 import React from "react";
-import { Pane, FullCircleIcon } from "evergreen-ui";
+import Pawn from "./Pawn";
+import { Pane } from "evergreen-ui";
 import { CellColor, Step, isEven } from "../Utils";
-
 interface Props {
   position: { x: number; y: number };
   color: CellColor;
@@ -54,18 +54,17 @@ const Cell = ({
         leave();
       }}
     >
-      <FullCircleIcon
-        color={
-          onState
-            ? on0 === true
-              ? color.player0.click
-              : color.player1.click
-            : hoverState
-            ? hover
-            : background
-        }
-        size={width}
-      ></FullCircleIcon>
+      {onState && (
+        <Pawn
+          onState={onState}
+          hoverState={hoverState}
+          on0={on0}
+          color={color}
+          hover={hover}
+          background={background}
+          width={width}
+        ></Pawn>
+      )}
     </Pane>
   );
 };
